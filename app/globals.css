@@ -1,26 +1,184 @@
 @import "tailwindcss";
 
+/* =========================================================================
+   UNIFINDERS DESIGN SYSTEM — globals.css
+   Font: Plus Jakarta Sans (primary UI) + Inter (body copy)
+   Brand: #0070F0 (primary blue), #DE2B2B (accent red), #FFD700 (highlight)
+   ========================================================================= */
+
+@theme {
+  /* ── Brand Colors ── */
+  --color-primary:            #0070F0;
+  --color-primary-dark:       #005ACC;
+  --color-primary-light:      #D9EBFF;
+  --color-accent-red:         #DE2B2B;
+  --color-accent-yellow:      #FFD700;
+
+  /* ── Semantic UI ── */
+  --color-border:             #e2e8f0;
+  --color-input:              #e2e8f0;
+  --color-ring:               #0070F0;
+  --color-background:         #ffffff;
+  --color-foreground:         #0f172a;
+  --color-primary-foreground: #ffffff;
+  --color-secondary:          #f1f5f9;
+  --color-secondary-foreground: #1e293b;
+  --color-muted:              #f1f5f9;
+  --color-muted-foreground:   #64748b;
+  --color-accent:             #f59e0b;
+  --color-accent-foreground:  #ffffff;
+  --color-destructive:        #ef4444;
+  --color-destructive-foreground: #ffffff;
+  --color-card:               #ffffff;
+  --color-card-foreground:    #0f172a;
+
+  /* ── Typography ── */
+  --font-jakarta: var(--font-jakarta), system-ui, sans-serif;
+  --font-inter:   var(--font-inter),   system-ui, sans-serif;
+}
+
+/* ── Base HTML ── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background:   #ffffff;
+  --foreground:   #0f172a;
+  scroll-behavior: smooth;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background:  var(--background);
+  color:       var(--foreground);
+  font-family: var(--font-jakarta);
+  -webkit-font-smoothing:  antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* ── Custom Scrollbar ── */
+::-webkit-scrollbar       { width: 6px; }
+::-webkit-scrollbar-track { background: #f1f5f9; }
+::-webkit-scrollbar-thumb { background: #0070F0; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: #005ACC; }
+
+/* ── Text Selection ── */
+::selection      { background: #D9EBFF; color: #0f172a; }
+::-moz-selection { background: #D9EBFF; color: #0f172a; }
+
+/* ── Focus Ring ── */
+:focus-visible { outline: 2px solid #0070F0; outline-offset: 2px; }
+
+/* =========================================================================
+   CUSTOM ANIMATIONS
+   ========================================================================= */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0);    }
+  50%       { transform: translateY(-8px); }
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0);     }
+  50%       { transform: translateY(-12px); }
+}
+
+@keyframes shimmer {
+  from { background-position: -200% center; }
+  to   { background-position:  200% center; }
+}
+
+@keyframes count-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes slide-in-left {
+  from { opacity: 0; transform: translateX(-30px); }
+  to   { opacity: 1; transform: translateX(0);     }
+}
+
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(30px); }
+  to   { opacity: 1; transform: translateX(0);    }
+}
+
+@keyframes pulse-ring {
+  0%   { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 112, 240, 0.4); }
+  70%  { transform: scale(1);    box-shadow: 0 0 0 12px rgba(0, 112, 240, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 112, 240, 0);   }
+}
+
+/* ── Animation Utility Classes ── */
+.animate-fade-up        { animation: fade-up       0.6s ease-out both; }
+.animate-fade-in        { animation: fade-in        0.5s ease-out both; }
+.animate-float          { animation: float          3s ease-in-out infinite; }
+.animate-float-slow     { animation: float-slow     4s ease-in-out infinite; }
+.animate-shimmer        { animation: shimmer        2s linear infinite; }
+.animate-count-up       { animation: count-up       0.7s ease-out both; }
+.animate-slide-in-left  { animation: slide-in-left  0.6s ease-out both; }
+.animate-slide-in-right { animation: slide-in-right 0.6s ease-out both; }
+.animate-pulse-ring     { animation: pulse-ring     2s ease-in-out infinite; }
+
+/* ── Stagger delays for cards ── */
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
+.delay-600 { animation-delay: 600ms; }
+
+/* ── Gradient text utility ── */
+.gradient-text {
+  background: linear-gradient(135deg, #0070F0 0%, #0EA5E9 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Glassmorphism card ── */
+.glass-card {
+  background:    rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+/* ── Section transition overlaps ── */
+.section-overlap-top {
+  margin-top: -2px;
+}
+
+/* ── Search bar inputs — suppress browser default focus rings (visual bracket fix) ── */
+.search-bar-input,
+.search-bar-input:focus,
+.search-bar-input:active,
+.search-bar-input:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ── Scrollbar hide utility ── */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ── Force-suppress ALL browser borders/outlines on transparent search inputs ── */
+input[class*="bg-transparent"]:focus,
+input[class*="bg-transparent"]:focus-visible,
+input[class*="bg-transparent"]:active {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
 }

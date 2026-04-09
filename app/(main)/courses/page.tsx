@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Users, Star, CheckCircle2, BookOpen, Monitor, Award } from "lucide-react";
 import { COURSES } from "@/lib/constants/courses";
+import PageHero from "@/components/shared/PageHero";
 
 // ── Logo renderer per course ──────────────────────────────────
 function CourseLogo({ course }: { course: typeof COURSES[0] }) {
@@ -37,28 +38,12 @@ export default function CoursesPage() {
   return (
     <div className="min-h-screen bg-white">
 
-      {/* Hero Section */}
-      <div className="bg-gradient-to-br from-slate-900 via-[#0C1A3E] to-[#1D4ED8] pt-28 pb-14 px-6 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="absolute rounded-full border border-white/30"
-              style={{ width: 200 + i * 150, height: 200 + i * 150, top: "50%", right: "-100px", transform: "translateY(-50%)" }} />
-          ))}
-        </div>
-        <div className="relative z-10 max-w-7xl mx-auto">
-          <p className="text-xs text-blue-300 mb-4">
-            <Link href="/" className="hover:text-white transition-colors">Home</Link>
-            <span className="mx-1.5">›</span>
-            <span className="text-blue-100">Our Courses</span>
-          </p>
-          <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4 leading-tight">
-            Our Test Prep <span className="text-blue-400">Courses</span>
-          </h1>
-          <p className="text-blue-200 max-w-xl text-base leading-relaxed">
-            Industry-leading English proficiency and graduate test preparation by certified experts. Guaranteed score improvement or free retake coaching.
-          </p>
-        </div>
-      </div>
+      <PageHero
+        breadcrumb={[{ label: "Our Courses" }]}
+        title="Our Test Prep"
+        titleHighlight="Courses"
+        subtitle="Industry-leading English proficiency and graduate test preparation by certified experts. Guaranteed score improvement or free retake coaching."
+      />
 
       {/* Main Courses + Intellectual Pursuits */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
@@ -79,7 +64,7 @@ export default function CoursesPage() {
                         <span className="text-[10px] font-bold bg-[#1D4ED8] text-white px-1.5 py-0.5 rounded-md">New!</span>
                       )}
                     </div>
-                    <p className="text-xs text-slate-500 leading-snug">{course.fullName}</p>
+                    <p className="text-xs text-slate-500 leading-snug">{course.description}</p>
                     <div className="flex items-center gap-3 mt-2">
                       <span className="flex items-center gap-1 text-[11px] text-slate-400">
                         <Users className="w-3 h-3" /> {course.students}

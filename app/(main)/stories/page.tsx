@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight, Calendar, User, ArrowLeft, ArrowRight } from "lucide-react";
+import PageHero from "@/components/shared/PageHero";
 
 export const metadata: Metadata = {
   title: "Success Stories — Unifinders Education Pvt. Ltd.",
@@ -80,19 +81,13 @@ const STORIES = [
 export default function StoriesPage() {
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero */}
-      <div className="bg-gradient-to-br from-[#0C1A3E] via-[#1D4ED8] to-[#2563EB] pt-28 pb-20 px-4 text-center">
-        <nav className="text-xs text-blue-300 mb-5 flex items-center justify-center gap-1.5">
-          <Link href="/" className="hover:text-white transition-colors">Home</Link>
-          <ChevronRight className="w-3 h-3" /><span className="text-blue-100">Success Stories</span>
-        </nav>
-        <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-5 leading-tight">
-          Real Students. <span className="text-blue-300">Real Dreams.</span><br />Real Results.
-        </h1>
-        <p className="text-blue-200 text-sm max-w-xl mx-auto leading-relaxed">
-          Over 1,200 students have trusted Unifinders with their study abroad journey. Here are some of their stories.
-        </p>
-      </div>
+      <PageHero
+        breadcrumb={[{ label: "Success Stories" }]}
+        title="Real Students."
+        titleHighlight="Real Dreams."
+        titleSuffix="Real Results."
+        subtitle="Over 1,200 students have trusted Unifinders with their study abroad journey. Here are some of their stories."
+      />
 
       {/* Stories Grid */}
       <div className="max-w-6xl mx-auto px-4 py-16">

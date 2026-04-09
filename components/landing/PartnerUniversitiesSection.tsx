@@ -132,10 +132,10 @@ export default function PartnerUniversitiesSection({ universities }: { universit
             <ChevronLeft className="w-5 h-5" />
           </button>
           <Link
-            href="/universities"
+            href="/study"
             className="h-12 px-8 flex items-center text-sm font-semibold text-[#0070F0] border border-blue-200 rounded-xl hover:bg-blue-50 transition-colors"
           >
-            View all Universities
+            View all Destinations
           </Link>
           <button
             className="w-12 h-12 rounded-xl border border-blue-200 bg-white flex items-center justify-center hover:bg-blue-50 transition-colors text-[#0070F0]"

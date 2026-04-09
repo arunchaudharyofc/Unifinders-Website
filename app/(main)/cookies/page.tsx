@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
+import PageHero from "@/components/shared/PageHero";
 
 export const metadata: Metadata = {
   title: "Cookie Policy — Unifinders Education Pvt. Ltd.",
@@ -41,14 +42,12 @@ const COOKIE_TYPES = [
 export default function CookiesPage() {
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-gradient-to-br from-[#0C1A3E] to-[#1D4ED8] pt-28 pb-14 px-4 text-center">
-        <nav className="text-xs text-blue-300 mb-4 flex items-center justify-center gap-1.5">
-          <Link href="/" className="hover:text-white transition-colors">Home</Link>
-          <ChevronRight className="w-3 h-3" /><span className="text-blue-100">Cookie Policy</span>
-        </nav>
-        <h1 className="text-4xl font-extrabold text-white mb-3">Cookie Policy</h1>
-        <p className="text-blue-200 text-sm">Last updated: January 1, 2024</p>
-      </div>
+      <PageHero
+        breadcrumb={[{ label: "Cookie Policy" }]}
+        title="Cookie"
+        titleHighlight="Policy"
+        subtitle="Last updated: January 1, 2024"
+      />
 
       <div className="max-w-3xl mx-auto px-4 py-14 pb-20">
         <div className="bg-blue-50 border border-blue-100 rounded-2xl p-6 mb-10">

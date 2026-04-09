@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ChevronRight, Briefcase, MapPin, Clock, TrendingUp, Users, Heart } from "lucide-react";
+import PageHero from "@/components/shared/PageHero";
 
 export const metadata: Metadata = {
   title: "Careers — Unifinders Education Pvt. Ltd.",
@@ -28,24 +29,18 @@ const PERKS = [
 export default function CareersPage() {
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero */}
-      <div className="bg-gradient-to-br from-[#0C1A3E] via-[#1D4ED8] to-[#2563EB] pt-28 pb-20 px-4 text-center">
-        <nav className="text-xs text-blue-300 mb-5 flex items-center justify-center gap-1.5">
-          <Link href="/" className="hover:text-white transition-colors">Home</Link>
-          <ChevronRight className="w-3 h-3" /><span className="text-blue-100">Careers</span>
-        </nav>
-        <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-5 leading-tight">
-          Build Your Career at <br /><span className="text-blue-300">Unifinders</span>
-        </h1>
-        <p className="text-blue-200 text-sm max-w-xl mx-auto leading-relaxed mb-8">
-          Join a passionate team dedicated to transforming international education access for Nepali students. We&apos;re hiring across multiple roles.
-        </p>
-        <div className="flex items-center justify-center gap-3 flex-wrap">
-          <div className="flex items-center gap-2 bg-white/10 text-white text-sm px-4 py-2 rounded-full"><Users className="w-4 h-4" /> 25+ Team Members</div>
-          <div className="flex items-center gap-2 bg-white/10 text-white text-sm px-4 py-2 rounded-full"><TrendingUp className="w-4 h-4" /> Rapidly Growing</div>
-          <div className="flex items-center gap-2 bg-white/10 text-white text-sm px-4 py-2 rounded-full"><Heart className="w-4 h-4" /> Mission-Driven</div>
+      <PageHero
+        breadcrumb={[{ label: "Careers" }]}
+        title="Build Your Career at"
+        titleHighlight="Unifinders"
+        subtitle="Join a passionate team dedicated to transforming international education access for Nepali students. We're hiring across multiple roles."
+      >
+        <div className="flex items-center gap-3 flex-wrap mt-8">
+          <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white text-[13px] px-4 py-2 rounded-full border border-white/20"><Users className="w-4 h-4" /> 25+ Team Members</div>
+          <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white text-[13px] px-4 py-2 rounded-full border border-white/20"><TrendingUp className="w-4 h-4" /> Rapidly Growing</div>
+          <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white text-[13px] px-4 py-2 rounded-full border border-white/20"><Heart className="w-4 h-4" /> Mission-Driven</div>
         </div>
-      </div>
+      </PageHero>
 
       {/* Perks */}
       <div className="max-w-5xl mx-auto px-4 py-16">

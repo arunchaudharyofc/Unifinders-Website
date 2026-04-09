@@ -10,6 +10,7 @@ import {
   BLOG_FILTER_TAGS,
   BLOG_COUNTRIES,
 } from "@/lib/constants/blogs";
+import PageHero from "@/components/shared/PageHero";
 
 const POSTS_PER_PAGE = 9;
 
@@ -193,51 +194,34 @@ export default function BlogPage() {
   return (
     <div className="min-h-screen bg-slate-50">
 
-      {/* Breadcrumb */}
-      <div className="max-w-7xl mx-auto px-6 pt-6 pb-0">
-        <p className="text-xs text-slate-500">
-          <Link href="/" className="hover:text-[#1D4ED8] transition-colors">Home</Link>
-          <span className="mx-1.5">›</span>
-          <span className="text-slate-700 font-medium">Blogs</span>
-        </p>
-      </div>
-
-      {/* Hero Banner */}
-      <div className="mx-4 sm:mx-6 mt-4 rounded-3xl overflow-hidden relative bg-[#0C1A3E]" style={{ minHeight: 180 }}>
-        {/* Background pattern */}
-        <div className="absolute inset-0 opacity-10">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="absolute rounded-full border border-white/30"
-              style={{ width: 200 + i * 80, height: 200 + i * 80, top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
-          ))}
-        </div>
-        <div className="relative z-10 text-center py-12 px-6">
-          <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-2 tracking-tight">Our Blogs</h1>
-          <p className="text-blue-200 text-sm mb-8">The latest industry news, interviews, universities, and resources.</p>
-          {/* Search bar */}
-          <div className="flex items-center gap-3 max-w-2xl mx-auto bg-white rounded-xl p-1.5 shadow-2xl">
-            <div className="flex items-center gap-2 px-3 py-2 border-r border-slate-200 shrink-0 cursor-pointer" onClick={() => setFilterOpen(true)}>
-              <Filter className="w-4 h-4 text-slate-500" />
-              <span className="text-sm font-medium text-slate-600 hidden sm:block">Filter</span>
-            </div>
-            <input
-              type="text"
-              placeholder="Search for blog..."
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              onKeyDown={e => e.key === "Enter" && handleSearch()}
-              className="flex-1 text-sm text-slate-700 placeholder-slate-400 bg-transparent px-2 border-0 outline-none focus:outline-none ring-0 focus:ring-0"
-              style={{ boxShadow: 'none' }}
-            />
-            <button
-              onClick={handleSearch}
-              className="px-5 py-2 bg-[#1D4ED8] hover:bg-blue-700 text-white text-sm font-bold rounded-lg transition-all shrink-0"
-            >
-              Search
-            </button>
+      <PageHero
+        breadcrumb={[{ label: "Blogs" }]}
+        title="Our"
+        titleHighlight="Blogs"
+        subtitle="The latest industry news, interviews, universities, and resources."
+      >
+        <div className="flex items-center gap-3 max-w-2xl bg-white rounded-xl p-1.5 shadow-2xl">
+          <div className="flex items-center gap-2 px-3 py-2 border-r border-slate-200 shrink-0 cursor-pointer" onClick={() => setFilterOpen(true)}>
+            <Filter className="w-4 h-4 text-slate-500" />
+            <span className="text-sm font-medium text-slate-600 hidden sm:block">Filter</span>
           </div>
+          <input
+            type="text"
+            placeholder="Search for blog..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            onKeyDown={e => e.key === "Enter" && handleSearch()}
+            className="flex-1 text-sm text-slate-700 placeholder-slate-400 bg-transparent px-2 border-0 outline-none focus:outline-none ring-0 focus:ring-0"
+            style={{ boxShadow: 'none' }}
+          />
+          <button
+            onClick={handleSearch}
+            className="px-5 py-2 bg-[#1D4ED8] hover:bg-blue-700 text-white text-sm font-bold rounded-lg transition-all shrink-0"
+          >
+            Search
+          </button>
         </div>
-      </div>
+      </PageHero>
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">

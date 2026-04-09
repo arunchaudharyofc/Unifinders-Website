@@ -24,6 +24,7 @@ const ICON_MAP: Record<string, React.ElementType> = {
   MessageSquare,
   Landmark,
   Globe,
+  Users2,
 };
 
 // Reliable, relevant images (no CORS issues, directly accessible photos)

@@ -13,6 +13,7 @@ import {
   Calendar, CheckCircle2, Clock, Loader2, Mail, Phone,
   User, ChevronRight, MessageCircle, Star
 } from "lucide-react";
+import PageHero from "@/components/shared/PageHero";
 
 const TIME_SLOTS = ["10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"];
 const SERVICES = [
@@ -67,13 +68,42 @@ export default function AppointmentPage() {
   const set = (key: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
     setForm(f => ({ ...f, [key]: e.target.value }));
 
+  const [error, setError] = useState<string | null>(null);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.timeSlot) return;
+    if (!form.timeSlot) { setError("Please select a time slot."); return; }
+    if (!form.service) { setError("Please select a service."); return; }
+    if (!form.date) { setError("Please select a preferred date."); return; }
     setLoading(true);
-    await new Promise(r => setTimeout(r, 1200));
-    setSubmitted(true);
-    setLoading(false);
+    setError(null);
+    try {
+      const res = await fetch("/api/appointments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fullName: form.fullName,
+          email: form.email,
+          phone: form.phone,
+          service: form.service,
+          country: form.country || null,
+          // Fix timezone: HTML date input gives YYYY-MM-DD, treat as local noon to avoid UTC day shift
+          preferredDate: new Date(form.date + 'T12:00:00').toISOString(),
+          timeSlot: form.timeSlot,
+          message: form.message || null,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Failed to book appointment. Please try again.");
+      } else {
+        setSubmitted(true);
+      }
+    } catch {
+      setError("Network error. Please check your connection and try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const inputCls = "w-full h-11 px-4 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-[#1D4ED8] text-sm transition";
@@ -100,33 +130,22 @@ export default function AppointmentPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Hero */}
-      <div className="bg-gradient-to-br from-[#0C1A3E] via-[#1D4ED8] to-[#2563EB] pt-28 pb-16 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <nav className="text-xs text-blue-300 mb-4 flex items-center justify-center gap-1.5">
-            <Link href="/" className="hover:text-white transition-colors">Home</Link>
-            <ChevronRight className="w-3 h-3" />
-            <span className="text-blue-100">Book Appointment</span>
-          </nav>
-          <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4 leading-tight">
-            Book a Free <span className="text-blue-300">Consultation</span>
-          </h1>
-          <p className="text-blue-200 text-sm max-w-lg mx-auto leading-relaxed">
-            1-on-1 session with a certified Unifinders counselor. 100% free, no obligation. Helping students study abroad since 2018.
-          </p>
-
-          {/* Trust badges */}
-          <div className="flex flex-wrap justify-center gap-6 mt-8">
-            {FEATURES.map(f => (
-              <div key={f.text} className="flex items-center gap-2 text-sm text-white bg-white/10 px-4 py-2 rounded-full">
-                <span>{f.icon}</span> <span className="font-medium">{f.text}</span>
-              </div>
-            ))}
-          </div>
+      <PageHero
+        breadcrumb={[{ label: "Book Appointment" }]}
+        title="Book a Free"
+        titleHighlight="Consultation"
+        subtitle="1-on-1 session with a certified Unifinders counselor. 100% free, no obligation. Helping students study abroad since 2018."
+      >
+        <div className="flex flex-wrap items-center gap-3 mt-8">
+          {FEATURES.map(f => (
+            <div key={f.text} className="flex items-center gap-2 text-sm text-white bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/20">
+              <span className="text-base">{f.icon}</span> <span className="font-medium text-[13px]">{f.text}</span>
+            </div>
+          ))}
         </div>
-      </div>
+      </PageHero>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 -mt-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-8 items-start">
 
           {/* Main Form */}
@@ -137,6 +156,12 @@ export default function AppointmentPage() {
             </div>
 
             <form onSubmit={handleSubmit} className="p-8 space-y-6">
+              {/* Error Banner */}
+              {error && (
+                <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3">
+                  {error}
+                </div>
+              )}
               {/* Personal Info */}
               <div>
                 <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2 text-sm">

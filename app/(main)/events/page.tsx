@@ -10,6 +10,8 @@ type Tab = "all" | "upcoming" | "past";
 
 const ITEMS_PER_PAGE = 9;
 
+import PageHero from "@/components/shared/PageHero";
+
 export default function EventsPage() {
   const [tab, setTab] = useState<Tab>("all");
   const [search, setSearch] = useState("");
@@ -40,30 +42,27 @@ export default function EventsPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Hero / Header */}
-      <div className="bg-gradient-to-br from-[#0C1A3E] via-[#1D4ED8] to-[#2563EB] pt-28 pb-14 px-4 text-center">
-        <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-3">Our Events</h1>
-        <p className="text-blue-200 text-sm max-w-lg mx-auto mb-8">
-          Browse through various events and seminars in various universities and colleges.
-        </p>
-        {/* Search bar */}
-        <div className="max-w-2xl mx-auto flex items-center gap-2 bg-white rounded-xl px-4 py-2 shadow-lg">
-          <button className="flex items-center gap-1.5 text-sm font-semibold text-slate-600 border-r border-slate-200 pr-3 mr-1 shrink-0">
+      <PageHero
+        breadcrumb={[{ label: "Events" }]}
+        title="Our"
+        titleHighlight="Events"
+        subtitle="Browse through various events and seminars in various universities and colleges."
+        stat={{ value: String(filtered.length), label: "Live Events" }}
+      >
+        <div className="max-w-2xl flex items-center gap-2 bg-white/10 backdrop-blur-md rounded-xl px-4 py-2 border border-white/20">
+          <button className="flex items-center gap-1.5 text-sm font-semibold text-blue-100 border-r border-white/20 pr-3 mr-1 shrink-0">
             <Filter className="w-4 h-4" /> Filter
           </button>
-          <Search className="w-4 h-4 text-slate-400 shrink-0" />
+          <Search className="w-4 h-4 text-white/50 shrink-0" />
           <input
             type="text"
             placeholder="Search for events..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="flex-1 text-sm text-slate-700 placeholder-slate-400 outline-none bg-transparent py-1"
+            className="flex-1 text-sm text-white placeholder-blue-200/60 outline-none bg-transparent py-1 w-full"
           />
-          <button className="shrink-0 px-5 py-2 bg-[#1D4ED8] hover:bg-blue-700 text-white font-bold rounded-lg text-sm transition-all">
-            Search
-          </button>
         </div>
-      </div>
+      </PageHero>
 
       {/* Tabs */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-8">

@@ -90,13 +90,19 @@ export default function Footer() {
             <div className="flex gap-3 justify-end">
               {FOOTER_DATA.socialLinks.map((social) => {
                 const Icon = SOCIAL_ICONS[social.icon];
+                const brandStyles: Record<string, string> = {
+                  Facebook: "bg-[#1877F2] text-white border-[#1877F2] hover:bg-[#166fe5] hover:border-[#166fe5]",
+                  Instagram: "bg-gradient-to-tr from-[#f09433] via-[#e6683c] to-[#dc2743] text-white border-transparent hover:opacity-90",
+                  Linkedin:  "bg-[#0A66C2] text-white border-[#0A66C2] hover:bg-[#004182] hover:border-[#004182]",
+                  TikTok:    "bg-[#010101] text-white border-[#010101] hover:bg-[#333] hover:border-[#333]",
+                };
                 return (
                   <a
                     key={social.platform}
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-11 h-11 rounded-full border border-slate-300 flex items-center justify-center text-slate-600 hover:text-[#0070F0] hover:border-[#0070F0] transition-colors bg-white"
+                    className={`w-11 h-11 rounded-full border flex items-center justify-center transition-all ${brandStyles[social.icon] ?? "bg-white text-slate-600 border-slate-300 hover:text-[#0070F0] hover:border-[#0070F0]"}`}
                     aria-label={`Follow on ${social.platform}`}
                   >
                     {Icon && <Icon className="w-[18px] h-[18px]" />}

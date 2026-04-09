@@ -3,6 +3,7 @@
  */
 import Link from "next/link";
 import { ArrowRight, GraduationCap, Banknote, Clock } from "lucide-react";
+import PageHero from "@/components/shared/PageHero";
 
 export const metadata = {
   title: "Study Destinations | Unifinders",
@@ -104,18 +105,12 @@ export default function StudyPage() {
   return (
     <div className="min-h-screen bg-slate-50 pt-[72px]">
 
-      {/* Page Hero Header */}
-      <div className="bg-gradient-to-br from-[#EFF4FF] to-white border-b border-slate-200 py-12 px-4">
-        <div className="max-w-6xl mx-auto">
-          <p className="text-xs text-[#0070F0] mb-3 font-semibold uppercase tracking-widest">Home › Study Destinations</p>
-          <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-3">
-            Study <span className="text-[#0070F0]">Destinations</span>
-          </h1>
-          <p className="text-slate-500 text-lg max-w-2xl">
-            Choose from 8 top countries. We match you with the right university based on your profile, budget, and goals.
-          </p>
-        </div>
-      </div>
+      <PageHero
+        breadcrumb={[{ label: "Study Destinations" }]}
+        title="Study"
+        titleHighlight="Destinations"
+        subtitle="Choose from 8 top countries. We match you with the right university based on your profile, budget, and goals."
+      />
 
       {/* Content */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-20">

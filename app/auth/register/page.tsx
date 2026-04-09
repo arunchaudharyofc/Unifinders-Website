@@ -1,18 +1,18 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Loader2, CheckCircle2, ChevronDown } from "lucide-react";
+import { Eye, EyeOff, Loader2, CheckCircle2, ChevronDown, Mail } from "lucide-react";
 
 function LeftPanel() {
   return (
     <div className="hidden md:flex flex-col justify-between bg-[#1D4ED8] relative overflow-hidden w-[45%] shrink-0 p-8">
       <div className="absolute inset-0">
         <Image src="https://images.unsplash.com/photo-1501504905252-473c47e087f8?auto=format&fit=crop&w=600&q=60"
-          alt="Study abroad" fill unoptimized className="object-cover opacity-20" />
+          alt="Study abroad" fill unoptimized className="object-cover opacity-20" loading="eager" />
       </div>
       <div className="relative z-10">
         <div className="mb-12 flex items-center gap-2">
@@ -27,7 +27,7 @@ function LeftPanel() {
         <h2 className="text-2xl font-extrabold text-white leading-snug mb-8">
           Want to study abroad?<br />Sign up with unifinders!
         </h2>
-        {["Free counselling","Through application and visa guidance","Discover Scholarships","Complete Academic Support"].map(item => (
+        {["Free counselling", "Application and visa guidance", "Discover Scholarships", "Complete Academic Support"].map(item => (
           <div key={item} className="flex items-center gap-3 mb-4">
             <div className="w-5 h-5 rounded-full border-2 border-white flex items-center justify-center shrink-0">
               <CheckCircle2 className="w-3 h-3 text-white" />
@@ -45,45 +45,7 @@ function LeftPanel() {
   );
 }
 
-// OTP Input with auto-advance
-function OTPInput({ value, onChange }: { value: string[]; onChange: (v: string[]) => void }) {
-  const refs = [
-    useRef<HTMLInputElement>(null),
-    useRef<HTMLInputElement>(null),
-    useRef<HTMLInputElement>(null),
-    useRef<HTMLInputElement>(null),
-    useRef<HTMLInputElement>(null),
-    useRef<HTMLInputElement>(null),
-  ];
-
-  const handleKey = (idx: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Backspace" && !value[idx] && idx > 0) refs[idx - 1].current?.focus();
-  };
-
-  const handleChange = (idx: number, v: string) => {
-    const digit = v.replace(/\D/g, "").slice(-1);
-    const next = [...value];
-    next[idx] = digit;
-    onChange(next);
-    if (digit && idx < 5) refs[idx + 1].current?.focus();
-  };
-
-  return (
-    <div className="flex gap-3 justify-center my-6">
-      {Array.from({ length: 6 }).map((_, i) => (
-        <input key={i} ref={refs[i]} type="text" inputMode="numeric" maxLength={1}
-          value={value[i] || ""}
-          onChange={e => handleChange(i, e.target.value)}
-          onKeyDown={e => handleKey(i, e)}
-          className={`w-12 h-14 text-center text-xl font-extrabold border-2 rounded-xl outline-none transition-all ${
-            value[i] ? "border-[#1D4ED8] bg-blue-50 text-[#1D4ED8]" : "border-slate-200 bg-slate-50 text-slate-900"
-          } focus:border-[#1D4ED8] focus:ring-2 focus:ring-blue-100`} />
-      ))}
-    </div>
-  );
-}
-
-type Step = "register" | "otp" | "success";
+type Step = "register" | "otp_sent" | "success";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -97,54 +59,112 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [otp, setOtp] = useState<string[]>(Array(6).fill(""));
-  const [resendCooldown, setResendCooldown] = useState(0);
 
-  useEffect(() => {
-    if (resendCooldown <= 0) return;
-    const t = setInterval(() => setResendCooldown(c => c - 1), 1000);
-    return () => clearInterval(t);
-  }, [resendCooldown]);
-
+  /* ── Google OAuth ── */
   const handleGoogle = async () => {
     setLoading(true);
-    const { error } = await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: `${window.location.origin}/auth/callback` } });
+    setError(null);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
+    });
     if (error) setError(error.message);
     setLoading(false);
   };
 
+  /* ── Facebook OAuth ── */
   const handleFacebook = async () => {
     setLoading(true);
-    const { error } = await supabase.auth.signInWithOAuth({ provider: "facebook", options: { redirectTo: `${window.location.origin}/auth/callback` } });
+    setError(null);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "facebook",
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
+    });
     if (error) setError(error.message);
     setLoading(false);
   };
 
+  /* ── Email + Password Register ── */
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password.length < 8) { setError("Password must be at least 8 characters."); return; }
     setLoading(true);
     setError(null);
-    const { error } = await supabase.auth.signUp({
-      email, password,
-      options: { data: { full_name: fullName, phone }, emailRedirectTo: `${window.location.origin}/auth/callback` },
+
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { full_name: fullName, phone },
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
     });
-    if (error) { setError(error.message); } else { setStep("otp"); setResendCooldown(60); }
+
+    if (error) {
+      // User-friendly messages for known errors
+      if (error.status === 429 || error.message.toLowerCase().includes("rate limit") || error.message.toLowerCase().includes("email rate")) {
+        setError("Too many signup attempts. Please wait 5 minutes and try again, or use Google / Facebook to sign up instantly.");
+      } else if (error.message.toLowerCase().includes("already registered") || error.message.toLowerCase().includes("already been registered")) {
+        setError("This email is already registered. Please log in instead.");
+      } else {
+        setError(error.message);
+      }
+      setLoading(false);
+      return;
+    }
+
+    // If email confirmation required → show success screen with link
+    if (data.user && !data.session) {
+      // Confirmation email sent
+      setStep("otp_sent");
+    } else if (data.session) {
+      // Auto-confirmed → go straight to dashboard
+      setStep("success");
+      setTimeout(() => router.push("/dashboard"), 1500);
+    }
     setLoading(false);
   };
 
-  const handleVerifyOTP = () => {
-    const code = otp.join("");
-    if (code.length < 6) { setError("Please enter all 6 digits."); return; }
-    setStep("success");
-    setTimeout(() => router.push("/dashboard"), 2000);
-  };
-
-  const handleResend = () => {
-    if (resendCooldown > 0) return;
-    setResendCooldown(60);
-    supabase.auth.resend({ type: "signup", email });
-  };
+  /* ── Success: email sent ── */
+  if (step === "otp_sent") {
+    return (
+      <div className="w-full max-w-[860px] rounded-2xl overflow-hidden shadow-2xl flex bg-white">
+        <LeftPanel />
+        <div className="flex-1 flex flex-col justify-center px-8 py-10">
+          <div className="max-w-sm w-full mx-auto text-center">
+            <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4">
+              <Mail className="w-8 h-8 text-[#1D4ED8]" />
+            </div>
+            <h2 className="text-xl font-extrabold text-slate-900 mb-2">Check your email! 📬</h2>
+            <p className="text-sm text-slate-500 mb-1">
+              We sent a confirmation link to
+            </p>
+            <p className="text-sm font-bold text-[#1D4ED8] mb-6">{email}</p>
+            <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 text-left mb-6">
+              <p className="text-xs font-semibold text-slate-700 mb-2">Next steps:</p>
+              <ol className="text-xs text-slate-600 space-y-1 list-decimal list-inside">
+                <li>Open the email from Unifinders</li>
+                <li>Click the confirmation link</li>
+                <li>You'll be redirected to your dashboard</li>
+              </ol>
+            </div>
+            <p className="text-xs text-slate-400 mb-6">
+              Didn't receive it? Check your spam folder or{" "}
+              <button
+                onClick={() => setStep("register")}
+                className="text-[#1D4ED8] font-bold hover:underline"
+              >
+                try again
+              </button>
+            </p>
+            <Link href="/auth/login" className="text-sm font-bold text-[#1D4ED8] hover:underline">
+              Already confirmed? Log in →
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (step === "success") {
     return (
@@ -158,48 +178,6 @@ export default function RegisterPage() {
     );
   }
 
-  if (step === "otp") {
-    return (
-      <div className="w-full max-w-[860px] rounded-2xl overflow-hidden shadow-2xl flex bg-white">
-        <LeftPanel />
-        <div className="flex-1 flex flex-col justify-center px-8 py-10">
-          <div className="max-w-sm w-full mx-auto text-center">
-            <div className="w-16 h-16 rounded-full bg-[#1D4ED8] flex items-center justify-center mx-auto mb-4">
-              <svg viewBox="0 0 24 24" className="w-8 h-8 text-white" fill="currentColor">
-                <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 9h-2V5h2v6zm0 4h-2v-2h2v2z"/>
-              </svg>
-            </div>
-            <h2 className="text-xl font-extrabold text-slate-900 mb-2">OTP Verification!</h2>
-            <p className="text-sm text-slate-500 mb-1">We have sent you a text message with 6-digit verification code to</p>
-            <p className="text-sm font-bold text-[#1D4ED8]">{email}</p>
-            {error && <div className="bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl px-4 py-2 mt-3 text-left">{error}</div>}
-            <OTPInput value={otp} onChange={setOtp} />
-            <p className="text-sm text-slate-500 mb-6">
-              Didn&apos;t receive any code?{" "}
-              <button onClick={handleResend} disabled={resendCooldown > 0}
-                className="text-[#1D4ED8] font-bold hover:underline disabled:opacity-50">
-                {resendCooldown > 0 ? `Resend OTP (${resendCooldown}s)` : "Resend OTP"}
-              </button>
-            </p>
-            <button onClick={handleVerifyOTP}
-              className="w-full h-11 bg-[#1D4ED8] hover:bg-blue-700 text-white font-bold rounded-lg text-sm transition-all flex items-center justify-center gap-2 mb-4">
-              Verify Code
-            </button>
-            <p className="text-sm text-slate-500 mb-8">
-              Having trouble with OTP?{" "}
-              <Link href="/contact" className="text-[#1D4ED8] font-bold hover:underline">Get Help</Link>
-            </p>
-            <div className="flex items-center justify-center gap-4 text-xs text-slate-400 mb-1">
-              <Link href="/terms" className="hover:underline">Terms of Service</Link>
-              <Link href="/privacy" className="hover:underline">Privacy Policy</Link>
-            </div>
-            <p className="text-xs text-slate-400">©2024, Unifinders Education Pvt. Ltd.</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="w-full max-w-[860px] rounded-2xl overflow-hidden shadow-2xl flex bg-white">
       <LeftPanel />
@@ -207,7 +185,45 @@ export default function RegisterPage() {
         <div className="max-w-sm w-full mx-auto">
           <p className="text-xs font-bold text-[#1D4ED8] mb-1">Welcome to Unifinders!</p>
           <h1 className="text-2xl font-extrabold text-slate-900 mb-6">Create your account</h1>
-          {error && <div className="bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl px-4 py-3 mb-4">{error}</div>}
+
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl px-4 py-3 mb-4 leading-relaxed">
+              {error}
+            </div>
+          )}
+
+          {/* Social Auth Buttons */}
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            <button
+              onClick={handleGoogle}
+              disabled={loading}
+              className="h-11 border border-slate-200 rounded-lg flex items-center justify-center gap-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition disabled:opacity-50"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+              </svg>
+              Google
+            </button>
+            <button
+              onClick={handleFacebook}
+              disabled={loading}
+              className="h-11 border border-slate-200 rounded-lg flex items-center justify-center gap-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition disabled:opacity-50"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="#1877F2">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+              Facebook
+            </button>
+          </div>
+
+          <div className="relative my-4">
+            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200" /></div>
+            <div className="relative flex justify-center"><span className="px-3 bg-white text-xs text-slate-400">or sign up with email</span></div>
+          </div>
+
           <form onSubmit={handleRegister} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1.5">Full Name <span className="text-red-500">*</span></label>
@@ -218,7 +234,7 @@ export default function RegisterPage() {
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1.5">Email address <span className="text-red-500">*</span></label>
               <input type="email" required autoComplete="email" value={email} onChange={e => setEmail(e.target.value)}
-                placeholder="example@email.com"
+                placeholder="example@gmail.com"
                 className="w-full h-11 px-4 rounded-lg border border-slate-300 text-sm text-slate-900 placeholder-slate-400 outline-none focus:border-[#1D4ED8] focus:ring-2 focus:ring-blue-100 transition" />
             </div>
             <div>
@@ -247,33 +263,11 @@ export default function RegisterPage() {
             </div>
             <button type="submit" disabled={loading}
               className="w-full h-11 bg-[#1D4ED8] hover:bg-blue-700 text-white font-bold rounded-lg text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-60 mt-1">
-              {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Creating account...</> : "Create Account"}
+              {loading ? <><Loader2 className="w-4 h-4 animate-spin" />Creating account...</> : "Create Account"}
             </button>
           </form>
-          <div className="relative my-4">
-            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200" /></div>
-            <div className="relative flex justify-center"><span className="px-3 bg-white text-xs text-slate-400">or</span></div>
-          </div>
-          <div className="grid grid-cols-2 gap-3 mb-4">
-            <button onClick={handleGoogle} disabled={loading}
-              className="h-11 border border-slate-200 rounded-lg flex items-center justify-center gap-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition disabled:opacity-50">
-              <svg className="w-4 h-4" viewBox="0 0 24 24">
-                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-              </svg>
-              Google
-            </button>
-            <button onClick={handleFacebook} disabled={loading}
-              className="h-11 border border-slate-200 rounded-lg flex items-center justify-center gap-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition disabled:opacity-50">
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="#1877F2">
-                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-              </svg>
-              Facebook
-            </button>
-          </div>
-          <p className="text-center text-sm text-slate-500">
+
+          <p className="text-center text-sm text-slate-500 mt-4">
             Already have an account?{" "}
             <Link href="/auth/login" className="text-[#1D4ED8] font-bold hover:underline">Log in</Link>
           </p>

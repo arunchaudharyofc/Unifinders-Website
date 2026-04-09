@@ -27,7 +27,12 @@ export default function EventsSection({ events = [] }: { events?: EventRecord[] 
   // Normalize DB events or fallback to landing constants
   const normalizedEvents = useMemo(() => {
     if (events && events.length > 0) {
-      return events.map(e => {
+      return events.map((e: any) => {
+        // If it's a fallback constant event missing a start_date, return as is
+        if (!e.start_date && e.date) {
+          return e;
+        }
+        
         const startDate = new Date(e.start_date);
         return {
           id: e.id,
@@ -99,10 +104,10 @@ export default function EventsSection({ events = [] }: { events?: EventRecord[] 
                 style={{ animationDelay: `${i * 100}ms` }}
               >
                 {/* Image with Date Badge */}
-                <div className="h-48 relative overflow-hidden">
+                <div className="h-48 relative overflow-hidden bg-slate-100">
                   <Image
-                    src={event.image}
-                    alt={event.title}
+                    src={event.image || "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80"}
+                    alt={event.title || "Event Image"}
                     fill
                     sizes="(max-width: 768px) 100vw, 33vw"
                     className="object-cover group-hover:scale-105 transition-transform duration-500"

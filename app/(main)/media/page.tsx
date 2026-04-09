@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ChevronRight, Newspaper, Tv, Radio, Globe } from "lucide-react";
+import PageHero from "@/components/shared/PageHero";
 
 export const metadata: Metadata = {
   title: "In Media — Unifinders Education Pvt. Ltd.",
@@ -67,14 +68,12 @@ const MEDIA_FEATURES = [
 export default function MediaPage() {
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-gradient-to-br from-[#0C1A3E] via-[#1D4ED8] to-[#2563EB] pt-28 pb-20 px-4 text-center">
-        <nav className="text-xs text-blue-300 mb-5 flex items-center justify-center gap-1.5">
-          <Link href="/" className="hover:text-white transition-colors">Home</Link>
-          <ChevronRight className="w-3 h-3" /><span className="text-blue-100">In Media</span>
-        </nav>
-        <h1 className="text-4xl font-extrabold text-white mb-4">Unifinders in the Media</h1>
-        <p className="text-blue-200 text-sm max-w-lg mx-auto">Press coverage, news features, and media mentions about Unifinders Education.</p>
-      </div>
+      <PageHero
+        breadcrumb={[{ label: "In Media" }]}
+        title="Unifinders in the"
+        titleHighlight="Media"
+        subtitle="Press coverage, news features, and media mentions about Unifinders Education."
+      />
 
       <div className="max-w-4xl mx-auto px-4 py-16">
         <div className="space-y-6 mb-16">

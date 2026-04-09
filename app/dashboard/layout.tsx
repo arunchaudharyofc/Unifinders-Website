@@ -11,22 +11,70 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   LayoutDashboard, FileText, FolderOpen, Calendar,
-  GraduationCap, LogOut, User, Bell, ChevronRight
+  GraduationCap, LogOut, User, Bell, ChevronRight,
+  ShieldAlert, BookOpen, Presentation, Bookmark, Building, Users
 } from "lucide-react";
+import { db } from "@/lib/db";
 
 const NAV_ITEMS = [
-  { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
+  { label: "Overview",     href: "/dashboard",              icon: LayoutDashboard },
+  { label: "Profile",      href: "/dashboard/profile",      icon: User },
   { label: "Applications", href: "/dashboard/applications", icon: FileText },
-  { label: "Documents", href: "/dashboard/documents", icon: FolderOpen },
+  { label: "Documents",    href: "/dashboard/documents",    icon: FolderOpen },
   { label: "Appointments", href: "/dashboard/appointments", icon: Calendar },
-  { label: "Courses", href: "/courses", icon: GraduationCap },
+  { label: "Courses",      href: "/courses",                icon: GraduationCap },
+];
+
+const ADMIN_ITEMS = [
+  { label: "Appointments",  href: "/dashboard/admin/appointments",  icon: Calendar },
+  { label: "Students",      href: "/dashboard/admin/students",      icon: Users },
+  { label: "Blog CMS",      href: "/dashboard/admin/blog",          icon: BookOpen },
+  { label: "Events CMS",    href: "/dashboard/admin/events",        icon: Presentation },
+  { label: "Scholarships",  href: "/dashboard/admin/scholarships",  icon: Bookmark },
+  { label: "Courses",       href: "/dashboard/admin/courses",       icon: GraduationCap },
+  { label: "Universities",  href: "/dashboard/admin/universities",  icon: Building },
 ];
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
+  const { data } = await supabase.auth.getUser();
+  const user = data?.user;
   if (!user) redirect("/auth/login");
+
+  let profile = await db.profile.findUnique({
+    where: { userId: user.id },
+    select: { role: true }
+  });
+
+  // If new user (OAuth signup), create their initial Profile + Student rows
+  if (!profile) {
+    try {
+      const fullName = user.user_metadata?.full_name || user.email?.split("@")[0] || "Student";
+      
+      await db.profile.create({
+        data: {
+          userId: user.id,
+          role: "student", 
+          fullName,
+          avatar: user.user_metadata?.avatar_url || null,
+        }
+      });
+      await db.student.create({
+        data: {
+          userId: user.id,
+          email: user.email!,
+          firstName: fullName.split(" ")[0] || "",
+          lastName: fullName.split(" ").slice(1).join(" ") || "",
+        }
+      });
+
+      profile = { role: "student" };
+    } catch (e) {
+      console.error("[Dashboard Setup Error]", e);
+    }
+  }
+
+  const isAdmin = profile?.role === "admin";
 
   const fullName = user.user_metadata?.full_name || user.email?.split("@")[0] || "Student";
   const initials = fullName.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2);
@@ -48,13 +96,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
             <Image
               src="/images/logo.png" alt="Unifinders" width={120} height={32}
               className="object-contain"
-              onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
             />
           </Link>
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 px-4 py-6 space-y-1">
+        <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
           {NAV_ITEMS.map((item) => (
             <Link
               key={item.href}
@@ -66,6 +113,26 @@ export default async function DashboardLayout({ children }: { children: React.Re
               <ChevronRight className="w-3 h-3 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
             </Link>
           ))}
+
+          {isAdmin && (
+            <>
+              <div className="pt-4 pb-1 pl-4 flex items-center gap-2">
+                <ShieldAlert className="w-3.5 h-3.5 text-slate-400" />
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Admin</span>
+              </div>
+              {ADMIN_ITEMS.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-slate-600 hover:bg-blue-50 hover:text-[#0070F0] transition-colors text-sm font-medium group"
+                >
+                  <item.icon className="w-4 h-4 flex-shrink-0" />
+                  {item.label}
+                  <ChevronRight className="w-3 h-3 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+                </Link>
+              ))}
+            </>
+          )}
         </nav>
 
         {/* User + Sign Out */}

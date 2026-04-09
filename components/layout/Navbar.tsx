@@ -154,9 +154,9 @@ export default function Navbar() {
                         {/* Why Section */}
                         {MEGA_MENU_DATA[hoveredCountryKey as keyof typeof MEGA_MENU_DATA].sections.why && (
                           <div>
-                            <h3 className="text-[14px] font-bold text-[#1e293b] mb-4 flex items-center gap-1.5 cursor-pointer hover:text-[#0070F0] transition-colors w-fit">
-                              {MEGA_MENU_DATA[hoveredCountryKey as keyof typeof MEGA_MENU_DATA].sections.why.title} <ArrowUpRight className="w-3.5 h-3.5 text-slate-400" />
-                            </h3>
+                            <Link href={MEGA_MENU_DATA[hoveredCountryKey as keyof typeof MEGA_MENU_DATA].href} onClick={() => setCountryOpen(false)} className="text-[14px] font-bold text-[#1e293b] mb-4 flex items-center gap-1.5 hover:text-[#0070F0] transition-colors w-fit group">
+                              {MEGA_MENU_DATA[hoveredCountryKey as keyof typeof MEGA_MENU_DATA].sections.why.title} <ArrowUpRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#0070F0]" />
+                            </Link>
                             <ul className="space-y-2.5">
                               {MEGA_MENU_DATA[hoveredCountryKey as keyof typeof MEGA_MENU_DATA].sections.why.links.map((link, i) => (
                                 <li key={i}>
@@ -171,9 +171,9 @@ export default function Navbar() {
                         {/* Live Section */}
                         {MEGA_MENU_DATA[hoveredCountryKey as keyof typeof MEGA_MENU_DATA].sections.live && (
                           <div>
-                            <h3 className="text-[14px] font-bold text-[#1e293b] mb-4 flex items-center gap-1.5 cursor-pointer hover:text-[#0070F0] transition-colors w-fit">
-                              {MEGA_MENU_DATA[hoveredCountryKey as keyof typeof MEGA_MENU_DATA].sections.live.title} <ArrowUpRight className="w-3.5 h-3.5 text-slate-400" />
-                            </h3>
+                            <Link href={MEGA_MENU_DATA[hoveredCountryKey as keyof typeof MEGA_MENU_DATA].href} onClick={() => setCountryOpen(false)} className="text-[14px] font-bold text-[#1e293b] mb-4 flex items-center gap-1.5 hover:text-[#0070F0] transition-colors w-fit group">
+                              {MEGA_MENU_DATA[hoveredCountryKey as keyof typeof MEGA_MENU_DATA].sections.live.title} <ArrowUpRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#0070F0]" />
+                            </Link>
                             <ul className="space-y-2.5">
                               {MEGA_MENU_DATA[hoveredCountryKey as keyof typeof MEGA_MENU_DATA].sections.live.links.map((link, i) => (
                                 <li key={i}>
@@ -192,9 +192,9 @@ export default function Navbar() {
                         {/* Work Section */}
                         {MEGA_MENU_DATA[hoveredCountryKey as keyof typeof MEGA_MENU_DATA].sections.work && (
                           <div>
-                            <h3 className="text-[14px] font-bold text-[#1e293b] mb-4 flex items-center gap-1.5 cursor-pointer hover:text-[#0070F0] transition-colors w-fit">
-                              {MEGA_MENU_DATA[hoveredCountryKey as keyof typeof MEGA_MENU_DATA].sections.work.title} <ArrowUpRight className="w-3.5 h-3.5 text-slate-400" />
-                            </h3>
+                            <Link href={MEGA_MENU_DATA[hoveredCountryKey as keyof typeof MEGA_MENU_DATA].href} onClick={() => setCountryOpen(false)} className="text-[14px] font-bold text-[#1e293b] mb-4 flex items-center gap-1.5 hover:text-[#0070F0] transition-colors w-fit group">
+                              {MEGA_MENU_DATA[hoveredCountryKey as keyof typeof MEGA_MENU_DATA].sections.work.title} <ArrowUpRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#0070F0]" />
+                            </Link>
                             <ul className="space-y-2.5">
                               {MEGA_MENU_DATA[hoveredCountryKey as keyof typeof MEGA_MENU_DATA].sections.work.links.map((link, i) => (
                                 <li key={i}>
@@ -209,9 +209,9 @@ export default function Navbar() {
                         {/* Study Section */}
                         {MEGA_MENU_DATA[hoveredCountryKey as keyof typeof MEGA_MENU_DATA].sections.study && (
                           <div>
-                            <h3 className="text-[14px] font-bold text-[#1e293b] mb-4 flex items-center gap-1.5 cursor-pointer hover:text-[#0070F0] transition-colors w-fit">
-                              {MEGA_MENU_DATA[hoveredCountryKey as keyof typeof MEGA_MENU_DATA].sections.study.title} <ArrowUpRight className="w-3.5 h-3.5 text-slate-400" />
-                            </h3>
+                            <Link href={MEGA_MENU_DATA[hoveredCountryKey as keyof typeof MEGA_MENU_DATA].href} onClick={() => setCountryOpen(false)} className="text-[14px] font-bold text-[#1e293b] mb-4 flex items-center gap-1.5 hover:text-[#0070F0] transition-colors w-fit group">
+                              {MEGA_MENU_DATA[hoveredCountryKey as keyof typeof MEGA_MENU_DATA].sections.study.title} <ArrowUpRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#0070F0]" />
+                            </Link>
                             <ul className="space-y-2.5">
                               {MEGA_MENU_DATA[hoveredCountryKey as keyof typeof MEGA_MENU_DATA].sections.study.links.map((link, i) => (
                                 <li key={i}>

@@ -15,7 +15,6 @@ import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { VISA_STEPS } from "@/lib/constants/landing";
 import Link from "next/link";
-import NextImage from "next/image";
 
 export default function VisaCalculatorSection() {
   const [activeStep, setActiveStep] = useState(0);
@@ -66,15 +65,26 @@ export default function VisaCalculatorSection() {
             <div className="absolute -top-8 -left-8 w-48 h-48 bg-blue-100/30 rounded-full -z-10" />
 
             <div className="bg-white rounded-2xl border border-slate-100 shadow-xl p-8 md:p-10 relative z-10">
-              {/* Visa Gauge Image */}
-              <div className="mb-5">
-                <NextImage
-                  src="/images/visa-gauge.png"
-                  alt="Visa score representation"
-                  width={250}
-                  height={200}
-                  className="w-full h-40 object-contain max-w-[250px]"
-                />
+              {/* Visa Score Gauge — inline SVG, no image dependency */}
+              <div className="mb-5 flex justify-center">
+                <svg width="220" height="130" viewBox="0 0 220 130" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Visa eligibility score gauge">
+                  {/* Background arc */}
+                  <path d="M20 110 A90 90 0 0 1 200 110" stroke="#E2E8F0" strokeWidth="16" strokeLinecap="round" fill="none"/>
+                  {/* Colored segments */}
+                  <path d="M20 110 A90 90 0 0 1 65 34" stroke="#FCA5A5" strokeWidth="16" strokeLinecap="round" fill="none"/>
+                  <path d="M65 34 A90 90 0 0 1 135 22" stroke="#FDE68A" strokeWidth="16" strokeLinecap="round" fill="none"/>
+                  <path d="M135 22 A90 90 0 0 1 200 110" stroke="#6EE7B7" strokeWidth="16" strokeLinecap="round" fill="none"/>
+                  {/* Needle */}
+                  <line x1="110" y1="110" x2="148" y2="42" stroke="#1D4ED8" strokeWidth="3" strokeLinecap="round"/>
+                  <circle cx="110" cy="110" r="7" fill="#1D4ED8"/>
+                  {/* Labels */}
+                  <text x="14" y="126" fontSize="10" fill="#94A3B8" fontFamily="sans-serif">Low</text>
+                  <text x="96" y="16" fontSize="10" fill="#94A3B8" fontFamily="sans-serif">Mid</text>
+                  <text x="188" y="126" fontSize="10" fill="#94A3B8" fontFamily="sans-serif">High</text>
+                  {/* Score badge */}
+                  <rect x="78" y="72" width="64" height="26" rx="8" fill="#1D4ED8"/>
+                  <text x="110" y="89" fontSize="12" fill="white" fontFamily="sans-serif" fontWeight="bold" textAnchor="middle">72 / 100</text>
+                </svg>
               </div>
 
               <h3 className="text-xl md:text-2xl font-extrabold text-slate-900 mb-4">
@@ -97,7 +107,7 @@ export default function VisaCalculatorSection() {
         {/* CTA */}
         <div className="text-center mt-14">
           <Link
-            href="/visa-calculator"
+            href="/appointment"
             className="inline-flex items-center gap-2 h-14 px-10 bg-[#0070F0] text-white font-semibold rounded-2xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/25 hover:-translate-y-0.5 group text-base"
           >
             Try Visa Calculator today!

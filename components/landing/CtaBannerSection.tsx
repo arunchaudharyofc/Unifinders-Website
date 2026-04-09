@@ -1,100 +1,79 @@
 /**
- * CTA BANNER SECTION — Enterprise-grade with coded fallback
+ * CTA BANNER SECTION — Enterprise-grade with HTML text
  *
- * Primary: Uses the Figma-exported `cta-student.png` as a full section visual.
- * Fallback: If image fails, shows a rich gradient-coded CTA section.
- * The interactive "Get Started" button and stats are always live+accessible.
+ * Implements the Figma design using real text and buttons for accessibility
+ * and SEO, rather than relying on a static image banner.
  *
- * @updated  2026-04-01  — Coded fallback, stats, gradient design
+ * @updated  2026-04-09  — Real text and layout
  */
 "use client";
 
-import { useState } from "react";
-import { Star, ArrowRight, Users } from "lucide-react";
-import NextImage from "next/image";
+import { Star, ArrowRight, Trophy } from "lucide-react";
+import Image from "next/image";
 import { CTA_BANNER } from "@/lib/constants/landing";
 import Link from "next/link";
 
 export default function CtaBannerSection() {
-  const [imgFailed, setImgFailed] = useState(false);
-
   return (
-    <section id="cta-banner" aria-label="Call to action" className="bg-white py-12 md:py-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-        {/* ── Image-based CTA (primary) ── */}
-        {!imgFailed ? (
-          <div className="relative rounded-[28px] overflow-hidden shadow-lg group">
-            {/* Background design image */}
-            <NextImage
-              src="/images/cta-student.png"
-              alt="Happy student studying abroad"
-              width={1200}
-              height={400}
-              className="w-full h-auto object-contain transform translate-y-4 hover:translate-y-0 transition-transform duration-700"
-              loading="lazy"
-              aria-hidden="true"
-              onError={() => setImgFailed(true)}
-            />
-
-            {/* Interactive overlay — live clickable button */}
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-1/2 pl-10 md:pl-16 lg:pl-20 flex flex-col items-start gap-4">
-                <div className="flex-1" />
-                <Link
-                  href={CTA_BANNER.cta.href}
-                  className="inline-flex items-center gap-2 h-12 px-8 bg-[#0070F0] text-white font-semibold text-[15px] rounded-xl hover:bg-blue-700 transition-all shadow-md shadow-blue-400/30 hover:-translate-y-0.5 group/btn"
-                  style={{ marginTop: "58%" }}
-                >
-                  {CTA_BANNER.cta.text}
-                  <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
-                </Link>
-                <div className="flex-1" />
-              </div>
-            </div>
+    <section id="cta-banner" aria-label="Call to action" className="bg-white py-12 md:py-20 overflow-hidden">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative bg-[#F4F9FF] rounded-[32px] md:rounded-[40px] p-10 md:p-16 lg:p-20 flex flex-col md:flex-row items-center justify-between min-h-[400px]">
+          
+          {/* Left Text Content */}
+          <div className="w-full md:w-[60%] lg:w-1/2 relative z-10 text-center md:text-left">
+            <h2 className="text-3xl sm:text-4xl lg:text-[44px] font-extrabold text-slate-900 leading-[1.1] tracking-tight mb-4">
+              Are you interested in<br />
+              <span className="text-[#0070F0]">Studying Abroad?</span>
+            </h2>
+            <p className="text-slate-500 text-sm sm:text-base leading-relaxed mb-8 max-w-md mx-auto md:mx-0">
+              We'll help you find the perfect program, apply and start planning your adventure!
+            </p>
+            <Link
+              href={CTA_BANNER.cta.href}
+              className="inline-flex items-center justify-center gap-2 h-12 px-8 bg-[#0070F0] text-white font-semibold text-[15px] rounded-xl hover:bg-blue-700 transition-all shadow-md shadow-blue-400/30 group/btn"
+            >
+              Get Started
+              <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+            </Link>
           </div>
-        ) : (
-          /* ── Coded Fallback CTA ── */
-          <div className="relative rounded-[28px] overflow-hidden bg-gradient-to-br from-[#0070F0] via-[#0060D0] to-[#004AAD] p-10 md:p-16 lg:p-20">
-            {/* Decorative blobs */}
-            <div className="absolute -top-16 -right-16 w-64 h-64 bg-white/5 rounded-full" />
-            <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-white/5 rounded-full" />
 
-            <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-10">
-              {/* Text side */}
-              <div className="max-w-lg text-white">
-                <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight mb-4">
-                  {CTA_BANNER.headline}{" "}
-                  <span className="text-[#FFD700]">{CTA_BANNER.highlightedText}</span>
-                </h2>
-                <p className="text-blue-100 text-base md:text-lg mb-8 leading-relaxed">
-                  {CTA_BANNER.description}
-                </p>
-                <Link
-                  href={CTA_BANNER.cta.href}
-                  className="inline-flex items-center gap-2 h-14 px-10 bg-white text-[#0070F0] font-bold text-base rounded-xl hover:bg-blue-50 transition-all shadow-lg hover:-translate-y-0.5 group/btn"
-                >
-                  {CTA_BANNER.cta.text}
-                  <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
-                </Link>
+          {/* Right Image Content & Floating Badges */}
+          <div className="w-full md:w-[40%] lg:w-1/2 mt-12 md:mt-0 relative flex justify-center md:block">
+            {/* 
+              If the actual student image exists, it'll display beautifully here. 
+              We use arbitrary scaling/transform to place it exactly on the right. 
+            */}
+            <div className="relative w-[300px] sm:w-[350px] md:w-full md:absolute md:-bottom-24 md:-right-8 lg:-right-4 h-[400px]">
+              <Image
+                src="/images/hero-student.png"
+                alt="Happy student studying abroad"
+                fill
+                className="object-contain object-bottom"
+                priority
+              />
+
+              {/* Floating "Trophy" badge - Top Right */}
+              <div className="absolute top-[20%] right-0 md:-right-4 bg-white rounded-xl p-3 shadow-lg flex items-center justify-center animate-bounce-slow" style={{ animationDuration: '4s' }}>
+                <Trophy className="w-6 h-6 text-yellow-500 fill-yellow-500" />
               </div>
 
-              {/* Stats side */}
-              <div className="flex flex-col items-center bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 min-w-[200px]">
-                <Users className="w-8 h-8 text-white mb-3" />
-                <p className="text-4xl font-extrabold text-white">{CTA_BANNER.stats.value}</p>
-                <p className="text-blue-200 text-sm font-medium mt-1">{CTA_BANNER.stats.label}</p>
-                <div className="flex items-center gap-1 mt-3">
-                  {[1, 2, 3, 4].map((s) => (
-                    <Star key={s} className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                  ))}
-                  <Star className="w-4 h-4 text-yellow-400/50" />
+              {/* Floating "Happy Clients" badge - Bottom Left */}
+              <div className="absolute bottom-[10%] -left-8 md:-left-16 bg-white rounded-2xl p-4 shadow-xl border border-slate-50">
+                <p className="text-sm font-extrabold text-slate-900 mb-1">20k Happy Clients</p>
+                <div className="flex items-center gap-1.5">
+                  <div className="flex items-center">
+                    {[1, 2, 3, 4].map((s) => (
+                      <Star key={s} className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500" />
+                    ))}
+                    <Star className="w-3.5 h-3.5 text-slate-200 fill-slate-200" />
+                  </div>
+                  <span className="text-[11px] font-semibold text-slate-500">4.0 of 15k</span>
                 </div>
-                <p className="text-blue-200 text-xs mt-1">{CTA_BANNER.stats.rating}</p>
               </div>
             </div>
           </div>
-        )}
+
+        </div>
       </div>
     </section>
   );

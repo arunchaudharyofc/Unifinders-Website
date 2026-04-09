@@ -269,9 +269,9 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
   const course = COURSES.find(c => c.slug === slug);
   if (!course) notFound();
 
-  const instructors = course.instructors
-    .map(id => COURSE_INSTRUCTORS.find(i => i.id === id))
-    .filter(Boolean) as typeof COURSE_INSTRUCTORS;
+  const instructors = (course.instructors ?? [])
+    .map((inst) => COURSE_INSTRUCTORS.find((i) => i.fullName === inst.fullName))
+    .filter((i): i is typeof COURSE_INSTRUCTORS[number] => !!i);
 
   const [activeTab, setActiveTab] = useState<Tab>("about");
   const [enrollOpen, setEnrollOpen] = useState(false);
@@ -309,9 +309,9 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
         {/* Course Header */}
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mb-6">
           <div className="flex items-start gap-5 mb-5">
-            <CourseLogoLarge slug={course.slug} name={course.name} accentColor={course.accentColor} />
+            <CourseLogoLarge slug={course.slug} name={course.name} accentColor={course.accentColor ?? "#1D4ED8"} />
             <div className="flex-1 min-w-0">
-              <h1 className="text-xl md:text-2xl font-extrabold text-slate-900 leading-snug mb-1">{course.fullName} ({course.name})</h1>
+              <h1 className="text-xl md:text-2xl font-extrabold text-slate-900 leading-snug mb-1">{course.name}</h1>
               <p className="text-sm text-slate-500 mb-3">{course.tagline}</p>
               <button onClick={() => setEnrollOpen(true)}
                 className="px-6 py-2 bg-[#1D4ED8] hover:bg-blue-700 text-white font-bold rounded-xl text-sm transition-all">
@@ -322,11 +322,10 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
 
           {/* Highlights row */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-5 border-t border-slate-100">
-            {course.highlights.map(h => (
-              <div key={h.label} className="text-center">
-                <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center mx-auto mb-2 text-lg">{h.icon}</div>
-                <p className="text-[10px] text-slate-400 font-medium">{h.label}</p>
-                <p className="text-sm font-extrabold text-slate-900">{h.value}</p>
+            {(course.highlights ?? []).map((h, idx) => (
+              <div key={idx} className="text-center">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center mx-auto mb-2 text-lg">🎯</div>
+                <p className="text-sm font-extrabold text-slate-900">{h}</p>
               </div>
             ))}
           </div>
@@ -347,8 +346,8 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
           {activeTab === "about" && (
             <div className="p-6 space-y-5">
               {/* Hero image */}
-              <div className="w-full h-52 md:h-72 rounded-2xl overflow-hidden bg-slate-100 relative">
-                <Image src={course.heroImage} alt={course.fullName} fill unoptimized className="object-cover" />
+              <div className="w-full h-52 md:h-72 rounded-2xl overflow-hidden bg-gradient-to-br from-blue-900 to-blue-600 relative flex items-center justify-center">
+                <span className="text-7xl">{course.icon}</span>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                 <div className="absolute bottom-4 left-4 text-white">
                   <div className="flex items-center gap-3">
@@ -365,26 +364,13 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
               </div>
 
               {/* Text overview */}
-              {course.overview.map((para, i) => {
-                if (para.startsWith("What") || para.startsWith("Why")) {
-                  const [heading, ...rest] = para.split("\n");
-                  return (
-                    <div key={i}>
-                      <h3 className="font-extrabold text-slate-900 mb-2 text-sm">{heading}</h3>
-                      {rest.map((line, j) => (
-                        <p key={j} className="text-sm text-slate-600 leading-relaxed mb-1">{line}</p>
-                      ))}
-                    </div>
-                  );
-                }
-                return <p key={i} className="text-sm text-slate-600 leading-relaxed">{para}</p>;
-              })}
+              <p className="text-sm text-slate-600 leading-relaxed">{course.overview ?? course.description}</p>
 
               {/* Key features */}
               <div className="bg-blue-50 rounded-2xl p-5">
                 <h3 className="font-extrabold text-slate-900 mb-4">What&apos;s Included</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  {course.features.map(f => (
+                  {(course.features ?? []).map(f => (
                     <div key={f} className="flex items-start gap-2 text-sm text-slate-700">
                       <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
                       <span>{f}</span>
@@ -414,7 +400,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
                 <BookOpen className="w-5 h-5 text-[#1D4ED8]" /> {course.name} Study Plan
               </h2>
               <div className="space-y-3">
-                {course.syllabus.map((item, i) => (
+                {(course.syllabus ?? []).map((item, i) => (
                   <div key={i} className="flex items-start gap-4 p-4 bg-white rounded-xl border border-slate-100 shadow-sm">
                     <div className="w-8 h-8 rounded-full bg-[#1D4ED8] text-white text-xs font-extrabold flex items-center justify-center shrink-0">{i + 1}</div>
                     <div>
@@ -457,7 +443,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
             <div className="p-6">
               <h2 className="text-base font-extrabold text-slate-900 mb-6">Study Resources</h2>
               <div className="space-y-3">
-                {course.resources.map((res, i) => (
+                {(course.resources ?? []).map((res, i) => (
                   <div key={i} className="flex items-center gap-4 p-4 bg-white rounded-xl border border-slate-100 shadow-sm hover:border-[#1D4ED8]/30 transition-all group cursor-pointer">
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
                       res.type === "PDF" ? "bg-red-50" : res.type === "Video" ? "bg-purple-50" : "bg-green-50"
@@ -468,7 +454,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
                     </div>
                     <div className="flex-1">
                       <p className="text-sm font-bold text-slate-900 group-hover:text-[#1D4ED8] transition-colors">{res.title}</p>
-                      <p className="text-xs text-slate-400">{res.type}{res.size ? ` · ${res.size}` : ""}</p>
+                      <p className="text-xs text-slate-400">{res.type}</p>
                     </div>
                     <Download className="w-4 h-4 text-slate-400 group-hover:text-[#1D4ED8] transition-colors shrink-0" />
                   </div>
@@ -482,7 +468,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
             <div className="p-6">
               <h2 className="text-base font-extrabold text-slate-900 mb-5">Frequently Asked Questions</h2>
               <div className="space-y-3">
-                {course.faqs.map((faq, i) => <FAQItem key={i} q={faq.q} a={faq.a} />)}
+                {(course.faqs ?? []).map((faq, i) => <FAQItem key={i} q={faq.q} a={faq.a} />)}
               </div>
             </div>
           )}
@@ -492,15 +478,15 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mb-6">
           <h2 className="text-base font-extrabold text-slate-900 mb-5">Programs &amp; Batches</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {course.programs.map((prog, i) => (
+            {(course.programs ?? []).map((prog, i) => (
               <div key={i} className="rounded-2xl overflow-hidden border border-slate-100 shadow-sm group cursor-pointer hover:shadow-md transition-all">
-                <div className="relative h-28 bg-slate-100 overflow-hidden">
-                  <Image src={prog.image} alt={prog.title} fill unoptimized className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                <div className="relative h-28 bg-slate-100 overflow-hidden flex items-center justify-center">
+                  <span className="text-4xl">{course.icon}</span>
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                 </div>
                 <div className="p-3">
-                  <h4 className="text-xs font-extrabold text-slate-900 mb-0.5 leading-snug">{prog.title}</h4>
-                  <p className="text-[10px] text-slate-500 mb-1">{prog.location}</p>
+                  <h4 className="text-xs font-extrabold text-slate-900 mb-0.5 leading-snug">{prog.name}</h4>
+                  <p className="text-[10px] text-slate-500 mb-1">{prog.format}</p>
                   <p className="text-[10px] font-semibold text-[#1D4ED8]">{prog.duration}</p>
                 </div>
               </div>
@@ -518,12 +504,12 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
                 <Link key={c.id} href={`/courses/${c.slug}`}
                   className="flex items-center gap-4 p-3 rounded-xl border border-slate-100 hover:border-[#1D4ED8]/30 hover:shadow-sm transition-all group">
                   <div className="w-12 h-8 rounded-lg flex items-center justify-center shrink-0"
-                    style={{ background: c.accentColor + "15", border: `1.5px solid ${c.accentColor}30` }}>
-                    <span className="text-xs font-extrabold" style={{ color: c.accentColor }}>{c.name}</span>
+                    style={{ background: (c.accentColor ?? "#1D4ED8") + "15", border: `1.5px solid ${c.accentColor ?? "#1D4ED8"}30` }}>
+                    <span className="text-xs font-extrabold" style={{ color: c.accentColor ?? "#1D4ED8" }}>{c.shortName ?? c.name}</span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-slate-900 group-hover:text-[#1D4ED8] transition-colors text-truncate">{c.fullName}</p>
-                    <p className="text-xs text-slate-400">{c.duration} · {c.price}</p>
+                    <p className="text-sm font-bold text-slate-900 group-hover:text-[#1D4ED8] transition-colors text-truncate">{c.name}</p>
+                    <p className="text-xs text-slate-400">{c.duration} · {c.price ? `NPR ${c.price.toLocaleString()}` : "Free"}</p>
                   </div>
                   <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#1D4ED8] transition-colors shrink-0" />
                 </Link>

@@ -776,13 +776,13 @@ export const MEGA_MENU_DATA: Record<string, {
 };
 
 export const COURSE_DROPDOWN = [
-  { label: "IELTS Preparation",  href: "/courses/ielts",  icon: "/images/ielts.png" },
-  { label: "GRE Preparation",    href: "/courses/gre",    icon: "/images/gre.png" },
-  { label: "SAT Preparation",    href: "/courses/sat",    icon: "/images/sat.png" },
-  { label: "PTE Preparation",    href: "/courses/pte",    icon: "/images/pte.png" },
-  { label: "TOEFL Preparation",  href: "/courses/toefl",  icon: "/images/toefl.png" },
-  { label: "OET Preparation",    href: "/courses/oet",    icon: "/images/oet.png" },
-  { label: "GMAT Preparation",   href: "/courses/gmat",   icon: "/images/gmat.png" },
+  { label: "IELTS Preparation",  href: "/courses/ielts-preparation",       icon: "/images/ielts.png"  },
+  { label: "GRE Preparation",    href: "/courses/gre-preparation",         icon: "/images/gre.png"   },
+  { label: "SAT Preparation",    href: "/courses/sat-preparation",         icon: "/images/sat.png"   },
+  { label: "PTE Preparation",    href: "/courses/pte-academic",            icon: "/images/pte.png"   },
+  { label: "TOEFL Preparation",  href: "/courses/toefl-preparation",       icon: "/images/toefl.png" },
+  { label: "OET Preparation",    href: "/courses/oet-preparation",         icon: "/images/oet.png"   },
+  { label: "GMAT Preparation",   href: "/courses/gmat-preparation",        icon: "/images/gmat.png"  },
 ] as const;
 
 export const NAV_LINKS = [
@@ -811,7 +811,7 @@ export const HERO_CONTENT = {
   },
   trustBadge: {
     count: "10k",
-    label: "Trusted by our clients",
+    label: "Trusted by our Students",
   },
   statCard: {
     value: "120+",
@@ -1059,10 +1059,10 @@ export const VISA_STEPS = [
 export const TESTIMONIALS = [
   {
     id: "testimonial-1",
-    name: "Tatiana Philips",
-    country: "United States",
+    name: "Sita Maharjan",
+    country: "Nepal → Australia",
     quote:
-      "Lorem ipsum dolor sit amet consectetur. Quis felis urna viverra eget leo purus iaculis. Vestibulum in mattis ut mi risus porta. In tincidunt ac neque amet nibh accumsan urna aliquet. Dolor hendrerit facilisi fames non elit elementum hac.",
+      "Unifinders completely transformed my study abroad journey. I was overwhelmed by the paperwork and visa requirements for Australia, but their counselors walked me through every step. I got into Monash University with a partial scholarship — something I never thought possible!",
     image: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=600&auto=format&fit=crop",
   },
   {
@@ -1174,18 +1174,18 @@ export const FOOTER_DATA = {
   socialLinks: [
     { platform: "Facebook",  href: "https://www.facebook.com/myunifinder/",       icon: "Facebook"  },
     { platform: "Instagram", href: "https://www.instagram.com/myunifinder",         icon: "Instagram" },
-    { platform: "LinkedIn",  href: "https://np.linkedin.com/company/myunifinder",  icon: "Linkedin" },
-    { platform: "TikTok",    href: "https://www.tiktok.com/@myunifinders",          icon: "Twitter"   },
+    { platform: "LinkedIn",  href: "https://np.linkedin.com/company/myunifinder",  icon: "Linkedin"  },
+    { platform: "TikTok",    href: "https://www.tiktok.com/@myunifinders",          icon: "TikTok"    },
   ],
   columns: [
     {
       title: "About Unifinders",
       links: [
-        { label: "About Us",       href: "/about"     },
-        { label: "Success Stories", href: "/stories"   },
-        { label: "Student",        href: "/student"    },
-        { label: "Recruiter",      href: "/recruiter"  },
-        { label: "Institution",    href: "/institution"},
+        { label: "About Us",       href: "/about"    },
+        { label: "Success Stories", href: "/stories"  },
+        { label: "Student",        href: "/student"  },
+        { label: "Recruiter",      href: "/recruiter"},
+        { label: "Institution",    href: "/institution" },
       ],
     },
     {

@@ -34,7 +34,7 @@ export default function BlogSection({ blogs }: { blogs?: any }) {
               {/* Image */}
               <div className="relative h-[250px] overflow-hidden">
                 <NextImage
-                  src={post.image}
+                  src={post.image || post.coverImage}
                   alt={post.title}
                   fill
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
@@ -45,9 +45,9 @@ export default function BlogSection({ blogs }: { blogs?: any }) {
               {/* Content */}
               <div className="p-6">
                 <div className="flex items-center gap-2 text-xs text-slate-400 mb-3">
-                  <span>{post.date}</span>
+                  <span>{post.date || (post.publishedAt ? new Date(post.publishedAt).toLocaleDateString() : 'Recent')}</span>
                   <span>•</span>
-                  <span>{post.author}</span>
+                  <span>{post.authorName || post.author?.name || (typeof post.author === 'string' ? post.author : 'Admin')}</span>
                 </div>
                 <h3 className="text-lg font-bold text-slate-900 mb-2">
                   {post.title}
@@ -56,7 +56,7 @@ export default function BlogSection({ blogs }: { blogs?: any }) {
                   {post.excerpt}
                 </p>
                 <Link
-                  href={`/blog/${post.id}`}
+                  href={`/blog/${post.slug || post.id}`}
                   className="inline-flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-[#0070F0] transition-colors group/link"
                 >
                   Learn More

@@ -11,6 +11,7 @@ import {
   QNA_QUESTIONS, QNA_CONTRIBUTORS, QNA_CATEGORIES, QNA_COUNTRIES,
   QNA_FILTER_TAGS, QNA_SPONSORED,
 } from "@/lib/constants/qna";
+import PageHero from "@/components/shared/PageHero";
 
 const ITEMS_PER_PAGE = 6;
 
@@ -289,40 +290,25 @@ export default function QnAPage() {
   return (
     <div className="min-h-screen bg-slate-50">
 
-      {/* Hero Banner */}
-      <div className="bg-[#0C1A3E] relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="absolute rounded-full border border-white/40"
-              style={{ width: 100 + i * 100, height: 100 + i * 100, top: "50%", right: "-50px", transform: "translateY(-50%)" }} />
-          ))}
-        </div>
-        <div className="relative z-10 max-w-7xl mx-auto px-6 pt-6 pb-2">
-          <p className="text-xs text-blue-300 mb-4">
-            <Link href="/" className="hover:text-white transition-colors">Home</Link>
-            <span className="mx-1.5">›</span>
-            <span className="text-blue-100">QnA</span>
-          </p>
-        </div>
-        <div className="relative z-10 text-center pb-8 px-6">
-          <h1 className="text-3xl md:text-5xl font-extrabold text-white mb-2 tracking-tight">Have a Question?</h1>
-          <p className="text-blue-200 text-sm mb-8">If you have any question you can ask below or enter what you are looking for!</p>
-          {/* Search + filter bar */}
-          <div className="flex items-center gap-3 max-w-2xl mx-auto bg-white rounded-xl p-1.5 shadow-2xl">
-            <div className="flex items-center gap-2 px-3 py-2 border-r border-slate-200 shrink-0 cursor-pointer" onClick={() => setFilterOpen(true)}>
-              <Filter className="w-4 h-4 text-slate-500" />
-              <span className="text-sm font-medium text-slate-600 hidden sm:block">Filter</span>
-            </div>
-            <input type="text" placeholder="Search for question..."
-              value={search} onChange={e => { setSearch(e.target.value); setPage(1); }}
-              className="flex-1 text-sm text-slate-700 placeholder-slate-400 bg-transparent px-2 border-0 outline-none focus:outline-none ring-0 focus:ring-0"
-              style={{ boxShadow: "none" }} />
-            <button className="px-5 py-2 bg-[#1D4ED8] hover:bg-blue-700 text-white text-sm font-bold rounded-lg transition-all shrink-0">
-              Search
-            </button>
+      <PageHero
+        breadcrumb={[{ label: "QnA" }]}
+        title="Have a"
+        titleHighlight="Question?"
+        subtitle="If you have any question you can ask below or enter what you are looking for!"
+      >
+        <div className="flex items-center gap-3 max-w-2xl bg-white rounded-xl p-1.5 shadow-2xl">
+          <div className="flex items-center gap-2 px-3 py-2 border-r border-slate-200 shrink-0 cursor-pointer" onClick={() => setFilterOpen(true)}>
+            <Filter className="w-4 h-4 text-slate-500" />
+            <span className="text-sm font-medium text-slate-600 hidden sm:block">Filter</span>
           </div>
+          <input type="text" placeholder="Search for question..."
+            value={search} onChange={e => { setSearch(e.target.value); setPage(1); }}
+            className="flex-1 text-sm text-slate-700 placeholder-slate-400 outline-none focus:outline-none bg-transparent px-2 border-none ring-0 focus:ring-0 search-bar-input" />
+          <button className="px-5 py-2 bg-[#1D4ED8] hover:bg-blue-700 text-white text-sm font-bold rounded-lg transition-all shrink-0">
+            Search
+          </button>
         </div>
-      </div>
+      </PageHero>
 
       {/* Category Tabs */}
       <div className="bg-white border-b border-slate-100 shadow-sm sticky top-0 z-20">

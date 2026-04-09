@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { ChevronRight, Users, Globe, Award, Heart, Target, BookOpen, TrendingUp } from "lucide-react";
+import PageHero from "@/components/shared/PageHero";
 
 export const metadata: Metadata = {
   title: "About Us — Unifinders Education Pvt. Ltd.",
@@ -32,20 +33,12 @@ const VALUES = [
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero */}
-      <div className="bg-gradient-to-br from-[#0C1A3E] via-[#1D4ED8] to-[#2563EB] pt-28 pb-20 px-4 text-center">
-        <nav className="text-xs text-blue-300 mb-5 flex items-center justify-center gap-1.5">
-          <Link href="/" className="hover:text-white transition-colors">Home</Link>
-          <ChevronRight className="w-3 h-3" /><span className="text-blue-100">About Us</span>
-        </nav>
-        <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-5 leading-tight">
-          Helping Nepali Students <br className="hidden md:block" />
-          <span className="text-blue-300">Dream Globally</span>
-        </h1>
-        <p className="text-blue-200 text-sm max-w-xl mx-auto leading-relaxed">
-          Since 2018, Unifinders Education Pvt. Ltd. has been Nepal&apos;s most trusted study abroad counseling platform — turning international education dreams into reality.
-        </p>
-      </div>
+      <PageHero
+        breadcrumb={[{ label: "About Us" }]}
+        title="Helping Nepali Students"
+        titleHighlight="Dream Globally"
+        subtitle="Since 2018, Unifinders Education Pvt. Ltd. has been Nepal's most trusted study abroad counseling platform — turning international education dreams into reality."
+      />
 
       {/* Stats */}
       <div className="max-w-5xl mx-auto px-4 -mt-8 mb-16">

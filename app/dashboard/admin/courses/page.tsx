@@ -3,7 +3,7 @@
  * ADMIN — COURSES CMS
  */
 import { useState, useEffect } from "react";
-import { Plus, Search, Trash2, Edit2, Loader2, GraduationCap, RefreshCw, Globe, Clock, Banknotes } from "lucide-react";
+import { Plus, Search, Trash2, Edit2, Loader2, GraduationCap, RefreshCw, Globe, Clock, Banknote } from "lucide-react";
 
 type CourseRow = { id: string; title: string; degree: string | null; university: string | null; country: string | null; duration: string | null; fee: string | null; status: string; };
 

@@ -26,9 +26,9 @@ export async function GET(req: NextRequest) {
         lastName: true,
         email: true,
         phone: true,
-        targetCountry: true,
-        studyLevel: true,
-        onboardingComplete: true,
+        preferredCountries: true,
+        preferredLevel: true,
+        profileStatus: true,
         createdAt: true,
         profile: { select: { role: true } }
       },

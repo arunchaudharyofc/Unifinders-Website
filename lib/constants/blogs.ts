@@ -49,7 +49,7 @@ export const BLOG_POSTS: BlogPost[] = [
     author: AUTHORS[0],
     date: "Dec 28, 2023",
     readTime: 8,
-    image: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=800&q=80",
+    image: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=800&q=80",
     featured: true,
     content: [
       { type: "paragraph", content: "Preparing for the GRE (Graduate Record Examination) can feel overwhelming, but with the right strategy, you can achieve your target score and gain admission to top graduate programs in the USA, Canada, and beyond." },

@@ -968,26 +968,26 @@ export const PARTNER_COUNTRY_FLAGS = [
 
 export const PARTNER_UNIVERSITIES = [
   // Australia (7)
-  { name: "UNSW Sydney",               logo: "https://logo.clearbit.com/unsw.edu.au",         country: "au" },
-  { name: "Monash University",          logo: "https://logo.clearbit.com/monash.edu",           country: "au" },
-  { name: "UTS",                        logo: "https://logo.clearbit.com/uts.edu.au",            country: "au" },
-  { name: "University of Canberra",     logo: "https://logo.clearbit.com/canberra.edu.au",       country: "au" },
-  { name: "University of Adelaide",     logo: "https://logo.clearbit.com/adelaide.edu.au",       country: "au" },
-  { name: "Macquarie University",       logo: "https://logo.clearbit.com/mq.edu.au",             country: "au" },
-  { name: "QUT",                        logo: "https://logo.clearbit.com/qut.edu.au",             country: "au" },
+  { name: "UNSW Sydney",               logo: "https://www.google.com/s2/favicons?domain=unsw.edu.au&sz=128",         country: "au" },
+  { name: "Monash University",          logo: "https://www.google.com/s2/favicons?domain=monash.edu&sz=128",           country: "au" },
+  { name: "UTS",                        logo: "https://www.google.com/s2/favicons?domain=uts.edu.au&sz=128",            country: "au" },
+  { name: "University of Canberra",     logo: "https://www.google.com/s2/favicons?domain=canberra.edu.au&sz=128",       country: "au" },
+  { name: "University of Adelaide",     logo: "https://www.google.com/s2/favicons?domain=adelaide.edu.au&sz=128",       country: "au" },
+  { name: "Macquarie University",       logo: "https://www.google.com/s2/favicons?domain=mq.edu.au&sz=128",             country: "au" },
+  { name: "QUT",                        logo: "https://www.google.com/s2/favicons?domain=qut.edu.au&sz=128",             country: "au" },
   // UK (2)
-  { name: "University of Strathclyde",  logo: "https://logo.clearbit.com/strath.ac.uk",          country: "gb" },
-  { name: "Richmond American Univ",     logo: "https://logo.clearbit.com/richmond.ac.uk",         country: "gb" },
+  { name: "University of Strathclyde",  logo: "https://www.google.com/s2/favicons?domain=strath.ac.uk&sz=128",          country: "gb" },
+  { name: "Richmond American Univ",     logo: "https://www.google.com/s2/favicons?domain=richmond.ac.uk&sz=128",         country: "gb" },
   // Canada (2)
-  { name: "Nipissing University",        logo: "https://logo.clearbit.com/nipissingu.ca",          country: "ca" },
-  { name: "University Canada West",      logo: "https://logo.clearbit.com/myucw.ca",               country: "ca" },
+  { name: "Nipissing University",        logo: "https://www.google.com/s2/favicons?domain=nipissingu.ca&sz=128",          country: "ca" },
+  { name: "University Canada West",      logo: "https://www.google.com/s2/favicons?domain=myucw.ca&sz=128",               country: "ca" },
   // New Zealand (1)
-  { name: "Victoria Univ of Wellington", logo: "https://logo.clearbit.com/wgtn.ac.nz",            country: "nz" },
+  { name: "Victoria Univ of Wellington", logo: "https://www.google.com/s2/favicons?domain=wgtn.ac.nz&sz=128",            country: "nz" },
   // USA (2)
-  { name: "University of Arizona",       logo: "https://logo.clearbit.com/arizona.edu",            country: "us" },
-  { name: "Northeastern University",     logo: "https://logo.clearbit.com/northeastern.edu",       country: "us" },
+  { name: "University of Arizona",       logo: "https://www.google.com/s2/favicons?domain=arizona.edu&sz=128",            country: "us" },
+  { name: "Northeastern University",     logo: "https://www.google.com/s2/favicons?domain=northeastern.edu&sz=128",       country: "us" },
   // India (1)
-  { name: "Amity University",            logo: "https://logo.clearbit.com/amity.edu",              country: "in" },
+  { name: "Amity University",            logo: "https://www.google.com/s2/favicons?domain=amity.edu&sz=128",              country: "in" },
 ] as const;
 
 // ---------------------------------------------------------------------------

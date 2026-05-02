@@ -178,7 +178,7 @@ export async function getUniversities(country?: string) {
     if (unis.length > 0) {
       return unis.map((u) => ({
         name: u.name,
-        logo: u.logoUrl ?? `https://www.google.com/s2/favicons?domain=${u.websiteUrl?.replace(/https?:\/\//, "") ?? "edu.com"}&sz=128`,
+        logo: u.logoUrl ?? `https://logo.clearbit.com/${u.websiteUrl?.replace(/https?:\/\//, "") ?? "edu.com"}`,
         country: u.country.toLowerCase().slice(0, 2),
       }));
     }

@@ -72,7 +72,7 @@ export default function AboutPage() {
             </Link>
           </div>
           <div className="relative h-72 rounded-2xl overflow-hidden shadow-xl">
-            <Image src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=800&q=80"
+            <Image src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80"
               alt="Students celebrating" fill unoptimized className="object-cover" />
           </div>
         </div>

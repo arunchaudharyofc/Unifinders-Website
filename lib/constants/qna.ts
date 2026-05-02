@@ -442,7 +442,7 @@ export const QNA_SPONSORED = [
     id: "s1",
     title: "OMGT BA LLB Admissions 2023",
     subtitle: "Approved by BCI",
-    image: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=300&q=80",
+    image: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=300&q=80",
   },
   {
     id: "s2",

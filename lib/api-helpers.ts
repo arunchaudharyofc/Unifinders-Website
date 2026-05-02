@@ -13,7 +13,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 import { db } from "@/lib/db";
+import { createModuleLogger } from "@/lib/logger";
 import type { UserRole } from "@prisma/client";
+
+const log = createModuleLogger("API:Helpers");
 
 // ─── Response Helpers ────────────────────────────────────────────────────────
 
@@ -159,7 +162,7 @@ export async function auditLog(params: {
     });
   } catch (e) {
     // Non-blocking — audit failures should never break the request
-    console.error("[AuditLog] Failed to write:", e);
+    log.error("AuditLog write failed", e);
   }
 }
 

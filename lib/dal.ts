@@ -9,6 +9,7 @@
  */
 
 import { db } from "./db";
+import { createModuleLogger } from "./logger";
 import {
   EVENTS as STATIC_EVENTS,
   BLOG_POSTS as STATIC_BLOGS,
@@ -18,6 +19,8 @@ import { BLOG_POSTS as FALLBACK_BLOGS } from "./constants/blogs";
 import { EVENTS as FALLBACK_EVENTS } from "./constants/events";
 import { SCHOLARSHIPS as FALLBACK_SCHOLARSHIPS } from "./constants/scholarships";
 import { COURSES as FALLBACK_COURSES } from "./constants/courses";
+
+const dalLog = createModuleLogger("DAL");
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -52,8 +55,8 @@ export async function getEvents(): Promise<EventRecord[]> {
         status: e.status === "UPCOMING" || e.status === "ONGOING" ? "upcoming" : "past",
       }));
     }
-  } catch (_e) {
-    console.warn("[DAL] Events DB unavailable, using fallback");
+  } catch (e) {
+    dalLog.warn("Events DB unavailable, using fallback", e);
   }
   // Fallback to events constants (already in correct shape)
   return FALLBACK_EVENTS as unknown as EventRecord[];
@@ -75,8 +78,8 @@ export async function getBlogPosts() {
     });
 
     if (posts.length > 0) return posts;
-  } catch (_e) {
-    console.warn("[DAL] BlogPosts DB unavailable, using fallback");
+  } catch (e) {
+    dalLog.warn("BlogPosts DB unavailable, using fallback", e);
   }
   return FALLBACK_BLOGS as unknown as typeof FALLBACK_BLOGS;
 }
@@ -91,8 +94,8 @@ export async function getBlogBySlug(slug: string) {
       db.blogPost.update({ where: { id: post.id }, data: { viewCount: { increment: 1 } } }).catch(() => {});
       return post;
     }
-  } catch (_e) {
-    console.warn("[DAL] Blog detail DB unavailable, using fallback");
+  } catch (e) {
+    dalLog.warn("Blog detail DB unavailable, using fallback", e);
   }
   return FALLBACK_BLOGS.find((b) => "slug" in b && b.slug === slug) ?? null;
 }
@@ -113,8 +116,8 @@ export async function getScholarships(filters?: { country?: string; level?: stri
     });
 
     if (scholarships.length > 0) return scholarships;
-  } catch (_e) {
-    console.warn("[DAL] Scholarships DB unavailable, using fallback");
+  } catch (e) {
+    dalLog.warn("Scholarships DB unavailable, using fallback", e);
   }
   return FALLBACK_SCHOLARSHIPS;
 }
@@ -126,8 +129,8 @@ export async function getScholarshipBySlug(slug: string) {
       db.scholarship.update({ where: { id: s.id }, data: { viewCount: { increment: 1 } } }).catch(() => {});
       return s;
     }
-  } catch (_e) {
-    console.warn("[DAL] Scholarship detail DB unavailable, using fallback");
+  } catch (e) {
+    dalLog.warn("Scholarship detail DB unavailable, using fallback", e);
   }
   return FALLBACK_SCHOLARSHIPS.find((s) => "slug" in s && s.slug === slug) ?? null;
 }
@@ -146,8 +149,8 @@ export async function getCourses(category?: string) {
     });
 
     if (courses.length > 0) return courses;
-  } catch (_e) {
-    console.warn("[DAL] Courses DB unavailable, using fallback");
+  } catch (e) {
+    dalLog.warn("Courses DB unavailable, using fallback", e);
   }
   return FALLBACK_COURSES;
 }
@@ -156,8 +159,8 @@ export async function getCourseBySlug(slug: string) {
   try {
     const course = await db.course.findUnique({ where: { slug, deletedAt: null } });
     if (course) return course;
-  } catch (_e) {
-    console.warn("[DAL] Course detail DB unavailable, using fallback");
+  } catch (e) {
+    dalLog.warn("Course detail DB unavailable, using fallback", e);
   }
   return FALLBACK_COURSES.find((c) => "slug" in c && c.slug === slug) ?? null;
 }
@@ -179,8 +182,8 @@ export async function getUniversities(country?: string) {
         country: u.country.toLowerCase().slice(0, 2),
       }));
     }
-  } catch (_e) {
-    console.warn("[DAL] Universities DB unavailable, using fallback");
+  } catch (e) {
+    dalLog.warn("Universities DB unavailable, using fallback", e);
   }
   return PARTNER_UNIVERSITIES;
 }
@@ -229,7 +232,7 @@ export async function getStudentDashboardData(userId: string) {
 
     return student;
   } catch (e) {
-    console.error("[DAL] getStudentDashboardData failed:", e);
+    dalLog.error("getStudentDashboardData failed", e);
     return null;
   }
 }

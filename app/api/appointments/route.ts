@@ -12,6 +12,9 @@ import {
   ok, err, rateLimit, parseBody, missingFields,
   requireAuth, requireRole, withSecurityHeaders,
 } from "@/lib/api-helpers";
+import { createModuleLogger } from "@/lib/logger";
+
+const log = createModuleLogger("API:Appointments");
 
 // ── POST /api/appointments ─────────────────────────────────────────────────
 
@@ -81,12 +84,13 @@ export async function POST(req: NextRequest) {
             country: appointment.country || "Not specified",
           },
         }),
-      }).catch(e => console.error("[Email send failed]", e));
+      }).catch(e => log.error("Email send failed", e));
     }
 
+    log.info("Appointment created", { id: appointment.id });
     return withSecurityHeaders(res);
   } catch (e) {
-    console.error("[Appointment POST]", e);
+    log.error("POST failed", e);
     return err("Failed to create appointment. Please try again.", 500);
   }
 }
@@ -120,7 +124,7 @@ export async function GET(req: NextRequest) {
     const res = ok({ appointments, total, page, limit });
     return withSecurityHeaders(res);
   } catch (e) {
-    console.error("[Appointment GET]", e);
+    log.error("GET failed", e);
     return err("Failed to fetch appointments", 500);
   }
 }

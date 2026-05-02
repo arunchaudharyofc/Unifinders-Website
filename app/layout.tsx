@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans, Inter } from "next/font/google";
 import "./globals.css";
+import ClientErrorLogger from "@/components/shared/ClientErrorLogger";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
@@ -18,6 +19,13 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "Unifinders — Your Gateway to Global Education",
+  icons: {
+    icon: [
+      { url: "/favicon.png", type: "image/png", sizes: "32x32" },
+      { url: "/icon-192.png", type: "image/png", sizes: "192x192" },
+    ],
+    apple: "/apple-icon.png",
+  },
   description:
     "AI-powered study abroad platform connecting students with top universities, scholarships, and expert counselors worldwide. Trusted by 12,000+ students. Start your journey today.",
   keywords: [
@@ -91,7 +99,10 @@ export default function RootLayout({
       lang="en"
       className={`${plusJakartaSans.variable} ${inter.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-jakarta">{children}</body>
+      <body className="min-h-full flex flex-col font-jakarta">
+        <ClientErrorLogger />
+        {children}
+      </body>
     </html>
   );
 }

@@ -15,6 +15,9 @@ import {
   ShieldAlert, BookOpen, Presentation, Bookmark, Building, Users
 } from "lucide-react";
 import { db } from "@/lib/db";
+import { createModuleLogger } from "@/lib/logger";
+
+const log = createModuleLogger("Dashboard");
 
 const NAV_ITEMS = [
   { label: "Overview",     href: "/dashboard",              icon: LayoutDashboard },
@@ -70,7 +73,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
       profile = { role: "student" };
     } catch (e) {
-      console.error("[Dashboard Setup Error]", e);
+      log.error("Auto-profile creation failed", e);
     }
   }
 

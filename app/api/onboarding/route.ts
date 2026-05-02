@@ -14,6 +14,9 @@ import {
   ok, err, requireAuth, rateLimit,
   parseBody, missingFields, withSecurityHeaders,
 } from "@/lib/api-helpers";
+import { createModuleLogger } from "@/lib/logger";
+
+const log = createModuleLogger("API:Onboarding");
 
 export async function POST(req: NextRequest) {
   const limited = rateLimit(req, 10, 60_000);
@@ -111,7 +114,7 @@ export async function POST(req: NextRequest) {
     const res = ok({ success: true, message: "Profile saved successfully" });
     return withSecurityHeaders(res);
   } catch (e) {
-    console.error("[/api/onboarding]", e);
+    log.error("POST failed", e);
     return err("Failed to save profile. Please try again.", 500);
   }
 }

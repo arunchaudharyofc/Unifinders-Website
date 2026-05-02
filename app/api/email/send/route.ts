@@ -9,13 +9,15 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
+import { createModuleLogger } from "@/lib/logger";
 
+const log = createModuleLogger("API:Email");
 const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "noreply@unifinders.com";
 
 export async function POST(req: NextRequest) {
   if (!process.env.RESEND_API_KEY) {
-    console.warn("[Email] RESEND_API_KEY not configured");
+    log.warn("RESEND_API_KEY not configured");
     return NextResponse.json({ success: false, error: "Email service not configured" }, { status: 503 });
   }
 
@@ -51,13 +53,13 @@ export async function POST(req: NextRequest) {
     });
 
     if (error) {
-      console.error("[Resend Error]", error);
+      log.error("Resend send failed", error);
       return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 
     return NextResponse.json({ success: true, id: result?.id });
   } catch (e) {
-    console.error("[Email API Error]", e);
+    log.error("Email API error", e);
     return NextResponse.json({ success: false, error: "Failed to send email" }, { status: 500 });
   }
 }

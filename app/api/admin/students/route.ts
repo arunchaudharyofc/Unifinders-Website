@@ -7,6 +7,9 @@
 import { NextRequest } from "next/server";
 import { db } from "@/lib/db";
 import { ok, err, requireAuth, requireRole, withSecurityHeaders } from "@/lib/api-helpers";
+import { createModuleLogger } from "@/lib/logger";
+
+const log = createModuleLogger("API:Admin:Students");
 
 export async function GET(req: NextRequest) {
   const authResult = await requireAuth(req);
@@ -42,7 +45,7 @@ export async function GET(req: NextRequest) {
     const res = ok({ students: formatted, total: formatted.length });
     return withSecurityHeaders(res);
   } catch (e) {
-    console.error("[Admin Students GET]", e);
+    log.error("GET failed", e);
     return err("Failed to fetch students", 500);
   }
 }

@@ -1,5 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { createModuleLogger } from "@/lib/logger";
+
+const log = createModuleLogger("Auth:Callback");
 
 /**
  * OAuth callback handler — Supabase exchanges the code for a session.
@@ -14,8 +17,12 @@ export async function GET(request: Request) {
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
+      log.info("OAuth code exchanged successfully, redirecting to " + next);
       return NextResponse.redirect(`${origin}${next}`);
     }
+    log.error("OAuth code exchange failed", error);
+  } else {
+    log.warn("No OAuth code in callback URL", { searchParams: Object.fromEntries(searchParams) });
   }
 
   return NextResponse.redirect(`${origin}/auth/login?error=auth_failed`);

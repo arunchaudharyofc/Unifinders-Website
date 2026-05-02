@@ -94,24 +94,9 @@ export default function PartnerUniversitiesSection({ universities }: { universit
               style={{ animationDelay: `${i * 50}ms` }}
               title={uni.name}
             >
-              <img
-                src={uni.logo}
-                alt={uni.name}
-                className="max-h-10 max-w-[140px] w-auto object-contain grayscale group-hover:grayscale-0 transition-all duration-300"
-                loading="lazy"
-                onError={(e) => {
-                  // Fallback: hide broken image, show text name
-                  const target = e.target as HTMLImageElement;
-                  target.style.display = "none";
-                  const parent = target.parentElement;
-                  if (parent && !parent.querySelector("span")) {
-                    const span = document.createElement("span");
-                    span.className = "text-xs font-bold text-slate-500 text-center uppercase tracking-wider leading-tight";
-                    span.textContent = uni.name;
-                    parent.appendChild(span);
-                  }
-                }}
-              />
+              <span className="text-xs font-bold text-slate-500 text-center uppercase tracking-wider leading-tight group-hover:text-[#0070F0] transition-colors">
+                {uni.name}
+              </span>
             </div>
           ))}
         </div>

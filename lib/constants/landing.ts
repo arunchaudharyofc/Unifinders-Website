@@ -113,7 +113,7 @@ export const MEGA_MENU_DATA: Record<string, {
         { value: "1.7 CR", label: "INTERNATIONAL", subLabel: "Highest Package Offered" },
         { value: "54.75 LPA", label: "NATIONAL", subLabel: "Highest Package Offered" },
       ],
-      image: "/images/Actor Image.png",
+      image: "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=600&q=80",
     },
   },
   "canada": {

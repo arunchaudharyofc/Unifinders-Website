@@ -235,7 +235,7 @@ export default function Navbar() {
                       alt="" 
                       width={320} 
                       height={620} 
-                      className="absolute bottom-0 right-0 h-[85%] w-auto object-contain z-0 object-right-bottom opacity-90 scale-110 origin-bottom-right" 
+                      className="absolute bottom-0 right-0 h-[85%] w-auto object-contain z-0 object-right-bottom opacity-80 grayscale mix-blend-luminosity scale-110 origin-bottom-right" 
                     />
                     
                     <div className="relative z-10 w-full">

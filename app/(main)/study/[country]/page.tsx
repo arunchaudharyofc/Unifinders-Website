@@ -294,7 +294,7 @@ export default function StudyCountryPage() {
                     </li>
                   ))}
                 </ul>
-                <Link href="/courses" className="inline-flex items-center gap-2 px-8 py-3 bg-[#1D4ED8] hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg hover:shadow-blue-300 transition-all text-sm">
+                <Link href="/auth/login" className="inline-flex items-center gap-2 px-8 py-3 bg-[#1D4ED8] hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg hover:shadow-blue-300 transition-all text-sm">
                   Find Universities in {dest.city.tabs[activeCity]} →
                 </Link>
               </div>

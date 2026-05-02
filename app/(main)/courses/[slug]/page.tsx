@@ -18,9 +18,9 @@ import {
 function CourseLogoLarge({ slug, name, accentColor }: { slug: string; name: string; accentColor: string }) {
   const bg = accentColor + "15";
   return (
-    <div className="w-24 h-16 rounded-xl flex items-center justify-center border-2 flex-shrink-0"
+    <div className="w-auto min-w-[96px] px-4 h-16 rounded-xl flex items-center justify-center border-2 flex-shrink-0"
       style={{ background: bg, borderColor: accentColor + "40" }}>
-      <span className="text-xl font-extrabold" style={{ color: accentColor }}>{name}</span>
+      <span className="text-xl font-extrabold" style={{ color: accentColor }}>{name.split(" ")[0]}</span>
     </div>
   );
 }

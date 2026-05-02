@@ -73,14 +73,14 @@ const WHY_CHOOSE_US = [
 
 /* ── Country-specific study images for "Everything" section ── */
 const STUDY_IMAGES: Record<string, string> = {
-  australia:     "https://images.unsplash.com/photo-1546938576-6e605b5aff92?auto=format&fit=crop&w=1200&q=80",
-  canada:        "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80",
-  usa:           "https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?auto=format&fit=crop&w=1200&q=80",
-  uk:            "https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=1200&q=80",
-  "new-zealand": "https://images.unsplash.com/photo-1507699622108-4be3abd695ad?auto=format&fit=crop&w=1200&q=80",
-  ireland:       "https://images.unsplash.com/photo-1564959130747-897fb406b9af?auto=format&fit=crop&w=1200&q=80",
-  india:         "https://images.unsplash.com/photo-1596176530529-78163a4f7af2?auto=format&fit=crop&w=1200&q=80",
-  bangladesh:    "https://images.unsplash.com/photo-1587326887550-93a8c14d9b4b?auto=format&fit=crop&w=1200&q=80",
+  australia:     "https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?auto=format&fit=crop&w=1200&q=80",
+  canada:        "https://images.unsplash.com/photo-1503614472-8c93d56e92ce?auto=format&fit=crop&w=1200&q=80",
+  usa:           "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=1200&q=80",
+  uk:            "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=1200&q=80",
+  "new-zealand": "https://images.unsplash.com/photo-1469521669194-babb45599def?auto=format&fit=crop&w=1200&q=80",
+  ireland:       "https://images.unsplash.com/photo-1590089415225-401ed6f9b8ce?auto=format&fit=crop&w=1200&q=80",
+  india:         "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=1200&q=80",
+  bangladesh:    "https://images.unsplash.com/photo-1608928233014-ee8fe8ab6d10?auto=format&fit=crop&w=1200&q=80",
   europe:        "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=1200&q=80",
   dubai:         "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1200&q=80",
 };
@@ -177,7 +177,7 @@ export default function StudyCountryPage() {
             {/* Video thumbnail */}
             <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-video bg-slate-100 group cursor-pointer">
               <Image
-                src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80"
+                src={studyImg}
                 alt={`Students in ${n}`}
                 fill
                 unoptimized
@@ -215,7 +215,7 @@ export default function StudyCountryPage() {
             <div className="relative flex justify-center">
               <div className="w-72 h-72 md:w-80 md:h-80 rounded-full overflow-hidden ring-8 ring-blue-100 shadow-2xl">
                 <Image
-                  src="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=600&q=80"
+                  src={studyImg}
                   alt="Graduate student"
                   width={320}
                   height={320}
@@ -294,11 +294,8 @@ export default function StudyCountryPage() {
                     </li>
                   ))}
                 </ul>
-                <Link
-                  href="/appointment"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-[#1D4ED8] hover:bg-blue-700 text-white font-bold rounded-lg text-sm shadow-md transition-all w-fit"
-                >
-                  Book an Appointment in {dest.city.tabs[activeCity]} →
+                <Link href="/courses" className="inline-flex items-center gap-2 px-8 py-3 bg-[#1D4ED8] hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg hover:shadow-blue-300 transition-all text-sm">
+                  Find Universities in {dest.city.tabs[activeCity]} →
                 </Link>
               </div>
               <div className="relative min-h-[280px]">

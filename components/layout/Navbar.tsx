@@ -244,16 +244,18 @@ export default function Navbar() {
                          <span className="text-[#3b82f6] text-[28px]">Best <br/>Placements</span>
                       </h3>
                       
-                      <div className="space-y-3 relative z-20 max-w-[170px]">
+                      <div className="space-y-4 relative z-20 max-w-[190px]">
                         {MEGA_MENU_DATA[hoveredCountryKey as keyof typeof MEGA_MENU_DATA].sidebar.stats.map((stat, i) => (
-                          <div key={i} className="bg-[#0047AB] rounded-lg p-3 shadow-md relative overflow-hidden group">
-                            <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-[#0047AB] opacity-0 group-hover:opacity-100 transition-opacity" />
-                            <div className="relative z-10 w-full mb-1">
-                              <span className="text-2xl font-bold text-white leading-none tracking-tight">{stat.value.split(' ')[0]}</span>
-                              {stat.value.split(' ')[1] && <span className="text-[14px] font-bold text-white leading-none ml-1">{stat.value.split(' ')[1]}</span>}
+                          <div key={i} className="flex flex-col">
+                            <div className="bg-[#0047AB] rounded-lg p-3 shadow-md relative overflow-hidden group w-fit pr-8">
+                              <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-[#0047AB] opacity-0 group-hover:opacity-100 transition-opacity" />
+                              <div className="relative z-10 w-full mb-0.5">
+                                <span className="text-3xl font-bold text-white leading-none tracking-tight">{stat.value.split(' ')[0]}</span>
+                                {stat.value.split(' ')[1] && <span className="text-[14px] font-bold text-white leading-none ml-1">{stat.value.split(' ')[1]}</span>}
+                              </div>
+                              <p className="text-[10px] font-bold text-white uppercase mt-0.5 relative z-10 tracking-widest">{stat.label}</p>
                             </div>
-                            <p className="text-[9px] font-bold text-white uppercase mt-1 relative z-10 tracking-widest">{stat.label}</p>
-                            {stat.subLabel && <p className="text-[9px] text-[#e2e8f0] font-medium leading-tight mt-0.5 relative z-10 max-w-[130px]">{stat.subLabel}</p>}
+                            {stat.subLabel && <p className="text-[12px] text-white font-medium leading-snug mt-1 relative z-10">{stat.subLabel}</p>}
                           </div>
                         ))}
                       </div>

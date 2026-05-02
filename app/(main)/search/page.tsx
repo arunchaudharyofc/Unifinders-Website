@@ -99,9 +99,9 @@ function SearchResults() {
               <Link key={c.id} href={`/courses/${c.slug}`}
                 className="flex items-center gap-4 p-4 bg-white border border-slate-100 rounded-2xl shadow-sm hover:border-[#0070F0]/40 hover:shadow-md transition-all group">
                 <div
-                  className="w-14 h-10 rounded-xl flex items-center justify-center font-extrabold text-sm flex-shrink-0"
+                  className="w-auto min-w-[56px] px-2 h-10 rounded-xl flex items-center justify-center font-extrabold text-sm flex-shrink-0"
                   style={{ background: (c.accentColor ?? "#0070F0") + "15", color: c.accentColor ?? "#0070F0", border: `1.5px solid ${c.accentColor ?? "#0070F0"}30` }}>
-                  {c.name}
+                  {c.shortName || c.name}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-bold text-sm text-slate-900 group-hover:text-[#0070F0] transition-colors">{c.name}</p>

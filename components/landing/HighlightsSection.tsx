@@ -111,7 +111,7 @@ export default function HighlightsSection() {
                       onError={(e) => {
                         // Fallback if image fails
                         e.currentTarget.srcset = "";
-                        e.currentTarget.src = "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=1200";
+                        e.currentTarget.src = "https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&q=80&w=1200";
                       }}
                     />
                     {/* Subtle overlay */}

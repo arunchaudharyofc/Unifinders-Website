@@ -113,7 +113,7 @@ export const MEGA_MENU_DATA: Record<string, {
         { value: "1.7 CR", label: "INTERNATIONAL", subLabel: "Highest Package Offered" },
         { value: "54.75 LPA", label: "NATIONAL", subLabel: "Highest Package Offered" },
       ],
-      image: "/images/Actor.png",
+      image: "/images/Actor Image.png",
     },
   },
   "canada": {
@@ -1063,7 +1063,7 @@ export const TESTIMONIALS = [
     country: "Nepal → Australia",
     quote:
       "Unifinders completely transformed my study abroad journey. I was overwhelmed by the paperwork and visa requirements for Australia, but their counselors walked me through every step. I got into Monash University with a partial scholarship — something I never thought possible!",
-    image: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=600&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1543269865-cbf427effbad?q=80&w=600&auto=format&fit=crop",
   },
   {
     id: "testimonial-2",

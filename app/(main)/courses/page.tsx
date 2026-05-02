@@ -19,9 +19,9 @@ function CourseLogo({ course }: { course: typeof COURSES[0] }) {
   };
   const style = logoStyles[course.slug] ?? { bg: "#F8FAFC", text: "#1D4ED8", border: "#E2E8F0" };
   return (
-    <div className="w-16 h-10 rounded-lg flex items-center justify-center shrink-0"
+    <div className="w-auto min-w-[64px] px-3 h-10 rounded-lg flex items-center justify-center shrink-0"
       style={{ background: style.bg, border: `1.5px solid ${style.border}` }}>
-      <span className="font-extrabold text-sm tracking-tight" style={{ color: style.text }}>{course.name}</span>
+      <span className="font-extrabold text-sm tracking-tight" style={{ color: style.text }}>{course.shortName || course.name}</span>
     </div>
   );
 }

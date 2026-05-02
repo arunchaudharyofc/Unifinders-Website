@@ -30,7 +30,7 @@ export const db = globalThis.prismaGlobal ?? prismaClientSingleton()
 
 // Attach event listeners for logging
 db.$on('error' as never, (e: unknown) => {
-  log.error('Prisma error event', e)
+  log.warn('Prisma error event', e) // Using warn instead of error to prevent Next.js dev overlay from blocking UI
 })
 db.$on('warn' as never, (e: unknown) => {
   log.warn('Prisma warning event', e)

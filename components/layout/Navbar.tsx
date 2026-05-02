@@ -83,16 +83,22 @@ export default function Navbar() {
 
           {/* ── Left: Logo + Browse by country ── */}
           <div className="flex items-center gap-3 shrink-0">
-            <Link href="/" className="shrink-0" aria-label="Unifinders Home">
-              <Image
-                src="/images/logo.png"
-                alt="Unifinders"
-                width={160}
-                height={40}
-                className="h-10 w-auto object-contain"
-                priority
-              />
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link href="/" className="shrink-0" aria-label="Unifinders Home">
+                <Image
+                  src="/images/logo.png"
+                  alt="Unifinders"
+                  width={160}
+                  height={40}
+                  className="h-10 w-auto object-contain"
+                  priority
+                />
+              </Link>
+              {/* Beta Badge */}
+              <span className="hidden sm:flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold tracking-widest uppercase bg-[#1D4ED8]/10 text-[#1D4ED8] border border-[#1D4ED8]/20 select-none">
+                BETA
+              </span>
+            </div>
 
             {/* Browse by Country — with dropdown */}
             <div ref={countryRef} className="relative hidden lg:block">

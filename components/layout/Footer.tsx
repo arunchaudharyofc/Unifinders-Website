@@ -204,11 +204,16 @@ export default function Footer() {
 
       {/* ── Dark copyright bar ── */}
       <div className="bg-slate-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 pb-20 sm:pb-5 flex flex-col sm:flex-row justify-between items-center gap-3">
-          <p className="text-sm text-slate-400">{FOOTER_DATA.copyright}</p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 pb-20 sm:pb-5 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div className="flex flex-col gap-1 text-center sm:text-left">
+            <p className="text-[11px] text-slate-500 font-medium">
+              Note: The Unifinders platform is currently in Public Beta. Some content and features are actively being updated.
+            </p>
+            <p className="text-[13px] text-slate-400">{FOOTER_DATA.copyright}</p>
+          </div>
           <button
             onClick={() => window?.scrollTo({ top: 0, behavior: "smooth" })}
-            className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors"
+            className="flex items-center gap-2 text-[13px] text-slate-400 hover:text-white transition-colors shrink-0"
             aria-label="Back to top"
           >
             Back to Top

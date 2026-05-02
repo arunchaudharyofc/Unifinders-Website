@@ -74,7 +74,7 @@ const WHY_CHOOSE_US = [
 /* ── Country-specific study images for "Everything" section ── */
 const STUDY_IMAGES: Record<string, string> = {
   australia:     "https://images.unsplash.com/photo-1546938576-6e605b5aff92?auto=format&fit=crop&w=1200&q=80",
-  canada:        "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80",
+  canada:        "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1200&q=80",
   usa:           "https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?auto=format&fit=crop&w=1200&q=80",
   uk:            "https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=1200&q=80",
   "new-zealand": "https://images.unsplash.com/photo-1507699622108-4be3abd695ad?auto=format&fit=crop&w=1200&q=80",
@@ -177,7 +177,7 @@ export default function StudyCountryPage() {
             {/* Video thumbnail */}
             <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-video bg-slate-100 group cursor-pointer">
               <Image
-                src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80"
+                src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=800&q=80"
                 alt={`Students in ${n}`}
                 fill
                 unoptimized

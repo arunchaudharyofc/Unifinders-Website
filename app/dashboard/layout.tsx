@@ -44,23 +44,21 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const user = data?.user;
   if (!user) redirect("/auth/login");
 
-  let profile: { role: string } | null = null;
+  let profile = await db.profile.findUnique({
+    where: { userId: user.id },
+    select: { role: true }
+  });
 
-  try {
-    profile = await db.profile.findUnique({
-      where: { userId: user.id },
-      select: { role: true }
-    });
-
-    // If new user (OAuth signup), create their initial Profile + Student rows
-    if (!profile) {
-      const fullNameVal = user.user_metadata?.full_name || user.email?.split("@")[0] || "Student";
+  // If new user (OAuth signup), create their initial Profile + Student rows
+  if (!profile) {
+    try {
+      const fullName = user.user_metadata?.full_name || user.email?.split("@")[0] || "Student";
       
       await db.profile.create({
         data: {
           userId: user.id,
           role: "student", 
-          fullName: fullNameVal,
+          fullName,
           avatar: user.user_metadata?.avatar_url || null,
         }
       });
@@ -68,17 +66,15 @@ export default async function DashboardLayout({ children }: { children: React.Re
         data: {
           userId: user.id,
           email: user.email!,
-          firstName: fullNameVal.split(" ")[0] || "",
-          lastName: fullNameVal.split(" ").slice(1).join(" ") || "",
+          firstName: fullName.split(" ")[0] || "",
+          lastName: fullName.split(" ").slice(1).join(" ") || "",
         }
       });
 
       profile = { role: "student" };
+    } catch (e) {
+      log.error("Auto-profile creation failed", e);
     }
-  } catch (e) {
-    log.error("DB unavailable for dashboard profile lookup, defaulting to student role", e);
-    // Dashboard still loads — just without admin features if DB is down
-    profile = { role: "student" };
   }
 
   const isAdmin = profile?.role === "admin";

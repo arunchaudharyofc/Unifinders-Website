@@ -1,11 +1,10 @@
-import ComingSoon from "@/components/shared/ComingSoon";
+import { redirect } from "next/navigation";
 
+/**
+ * /student — redirects to the Student Dashboard.
+ * If the user is not logged in, the middleware will send them to /auth/login
+ * first, and after login they'll land on /dashboard.
+ */
 export default function StudentPage() {
-  return (
-    <ComingSoon
-      title="Student Portal"
-      description="We're building a dedicated space for students to manage applications, track progress, and connect with counselors. Login to your student dashboard in the meantime."
-      backHref="/"
-    />
-  );
+  redirect("/dashboard");
 }

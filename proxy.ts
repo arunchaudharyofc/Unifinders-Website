@@ -4,7 +4,18 @@
  * Runs on every request BEFORE the page renders.
  * 1. Refresh Supabase session (keep cookies fresh)
  * 2. Protect /dashboard and /onboarding
- * 3. Set Content-Security-Policy + security headers
+ * 3. Set security headers (CSP WITHOUT nonce — see note below)
+ *
+ * ⚠️  WHY NO NONCE IN CSP:
+ *  When both a nonce AND 'unsafe-inline' appear in script-src, the browser
+ *  silently ignores 'unsafe-inline' (CSP Level 2+ spec).  This broke all
+ *  Next.js hydration inline scripts in production, causing login, registration,
+ *  and Navbar dropdowns to stop working completely.
+ *
+ *  The correct approach for Next.js is to use 'unsafe-inline' WITHOUT a nonce
+ *  since we control the entire script surface.  If you need strict-CSP with
+ *  nonces in the future, Next.js requires a custom nonce propagation setup
+ *  (see: https://nextjs.org/docs/app/building-your-application/configuring/content-security-policy).
  */
 
 import { type NextRequest, NextResponse } from "next/server";
@@ -22,6 +33,25 @@ const COURSE_ALIASES: Record<string, string> = {
   "/courses/det":    "/courses/duolingo-english-test",
 };
 
+/**
+ * CSP without nonce so 'unsafe-inline' is honoured by the browser.
+ * Headers are also set in next.config.ts for static routes — this proxy
+ * overrides them for dynamic SSR routes where we need the full value.
+ */
+const CSP = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live https://www.googletagmanager.com",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "font-src 'self' https://fonts.gstatic.com",
+  "img-src 'self' blob: data: https: http:",
+  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://vercel.live wss://vercel.live https://www.google-analytics.com",
+  "frame-src 'none'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self' https://accounts.google.com https://www.facebook.com",
+  "upgrade-insecure-requests",
+].join("; ");
+
 export default async function proxy(request: NextRequest) {
   // 0. Course alias redirects
   const { pathname } = request.nextUrl;
@@ -34,22 +64,9 @@ export default async function proxy(request: NextRequest) {
   const response = await updateSession(request);
 
   // 2. Security Headers (applied to ALL responses)
-  const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
-  const csp = [
-    `default-src 'self'`,
-    `script-src 'self' 'unsafe-eval' 'unsafe-inline' 'nonce-${nonce}' https://vercel.live`,
-    `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
-    `font-src 'self' https://fonts.gstatic.com`,
-    `img-src 'self' blob: data: https: http:`,
-    `connect-src 'self' https://*.supabase.co wss://*.supabase.co https://vercel.live`,
-    `frame-src 'none'`,
-    `object-src 'none'`,
-    `base-uri 'self'`,
-    `form-action 'self'`,
-    `upgrade-insecure-requests`,
-  ].join("; ");
-
-  response.headers.set("Content-Security-Policy", csp);
+  //    ──────────────────────────────────────────────
+  //    NOTE: No nonce is generated here. See file header for explanation.
+  response.headers.set("Content-Security-Policy", CSP);
   response.headers.set("X-Content-Type-Options", "nosniff");
   response.headers.set("X-Frame-Options", "DENY");
   response.headers.set("X-XSS-Protection", "1; mode=block");
@@ -68,6 +85,6 @@ export default async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|images/|fonts/|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|woff|woff2)).*)",
+    "/((?!_next/static|_next/image|favicon.ico|apple-icon.png|icon-192.png|images/|fonts/|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|woff|woff2)).*)",
   ],
 };

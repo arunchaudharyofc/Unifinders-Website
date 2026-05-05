@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { Search, ChevronDown, ArrowLeft, Bookmark, Repeat, Building, MapPin, GraduationCap, Check } from "lucide-react";
+import { Search, ChevronDown, ArrowLeft, Bookmark, Repeat, Building, MapPin, GraduationCap, Check, Calendar, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 export default async function UniversityDetailsPage({ params }: { params: { id: string } }) {

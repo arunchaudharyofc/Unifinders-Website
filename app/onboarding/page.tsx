@@ -34,10 +34,10 @@ type OnboardingData = {
 
 function LeftPanel() {
   return (
-    <div className="hidden md:flex flex-col justify-between bg-[#1D4ED8] relative overflow-hidden w-[400px] shrink-0 p-10">
+    <div className="hidden md:flex flex-col justify-between bg-[#1D4ED8] relative overflow-hidden w-[45%] shrink-0 p-10">
       <div className="absolute inset-0">
-        <img src="https://images.unsplash.com/photo-1501504905252-473c47e087f8?auto=format&fit=crop&w=600&q=60"
-          alt="Study abroad" className="object-cover w-full h-full opacity-20" />
+        <Image src="https://images.unsplash.com/photo-1501504905252-473c47e087f8?auto=format&fit=crop&w=600&q=60"
+          alt="Study abroad" fill unoptimized className="object-cover opacity-20" loading="eager" />
       </div>
       <div className="relative z-10">
         <div className="mb-12 flex items-center gap-2">
@@ -186,11 +186,11 @@ export default function OnboardingPage() {
   /* --- Render Main Layout for Steps 1-5 --- */
   return (
     <div className="w-full flex items-center justify-center">
-      <div className="w-full max-w-[960px] bg-white rounded-2xl overflow-hidden shadow-2xl flex min-h-[600px] max-h-[85vh]">
+      <div className="w-full max-w-[960px] bg-white rounded-2xl overflow-hidden shadow-2xl flex">
         <LeftPanel />
         
-        <div className="flex-1 flex flex-col h-full relative">
-          <div className="flex-1 overflow-y-auto p-10 pb-24 custom-scrollbar">
+        <div className="flex-1 flex flex-col">
+          <div className="flex-1 p-8 sm:p-10">
             {error && (
               <div className="bg-red-50 text-red-700 text-sm p-4 rounded-xl mb-6">{error}</div>
             )}
@@ -474,7 +474,7 @@ export default function OnboardingPage() {
           </div>
           
           {/* Bottom Navigation */}
-          <div className="h-20 border-t border-[#EAECF0] bg-white px-10 flex items-center justify-between shrink-0 absolute bottom-0 left-0 right-0 z-10 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.02)]">
+          <div className="p-6 sm:px-10 sm:py-6 border-t border-[#EAECF0] bg-white flex items-center justify-between shrink-0 mt-auto">
             <button onClick={back} className="flex items-center gap-2 text-[15px] font-bold text-[#344054] hover:text-[#101828] transition px-4 py-2 rounded-lg hover:bg-slate-50">
               <ArrowLeft className="w-4 h-4" /> Back
             </button>

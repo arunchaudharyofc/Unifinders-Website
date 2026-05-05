@@ -59,7 +59,7 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
       if (error.message.toLowerCase().includes("invalid") || error.message.toLowerCase().includes("credentials")) {
         setError("Incorrect email or password. Please try again, or use Google / Facebook to sign in.");
@@ -68,10 +68,26 @@ export default function LoginPage() {
       } else {
         setError(error.message);
       }
-    } else {
-      router.push("/dashboard");
-      router.refresh();
+      setLoading(false);
+      return;
     }
+    // Smart redirect: new users → onboarding, existing → dashboard
+    try {
+      const res = await fetch('/api/profile');
+      if (res.ok) {
+        const profile = await res.json();
+        if (profile?.data?.role === 'student') {
+          router.push('/dashboard');
+        } else {
+          router.push('/dashboard');
+        }
+      } else {
+        router.push('/onboarding');
+      }
+    } catch {
+      router.push('/dashboard');
+    }
+    router.refresh();
     setLoading(false);
   };
 
@@ -103,7 +119,7 @@ export default function LoginPage() {
 
       <div className="flex-1 flex flex-col justify-center px-8 py-10">
         <div className="max-w-sm w-full mx-auto">
-          <p className="text-xs font-bold text-[#1D4ED8] mb-1">Welcome back!</p>
+          <p className="text-xs font-bold text-[#1D4ED8] mb-1">Welcome to Unifinders!</p>
           <h1 className="text-2xl font-extrabold text-slate-900 mb-6">Log into your account</h1>
 
           {error && (
@@ -148,12 +164,7 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-sm font-medium text-slate-700" htmlFor="login-password">Password</label>
-                <Link href="/auth/forgot-password" className="text-xs text-[#1D4ED8] font-semibold hover:underline">
-                  Forgot Password?
-                </Link>
-              </div>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5" htmlFor="login-password">Password</label>
               <div className="relative">
                 <input id="login-password" type={showPassword ? "text" : "password"} required autoComplete="current-password"
                   value={password} onChange={e => setPassword(e.target.value)}
@@ -166,6 +177,17 @@ export default function LoginPage() {
               </div>
             </div>
 
+            {/* Remember me + Forgot Password row */}
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
+                <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-[#1D4ED8] focus:ring-blue-100" />
+                Remember me
+              </label>
+              <Link href="/auth/forgot-password" className="text-xs text-[#1D4ED8] font-semibold hover:underline">
+                Forgot Password?
+              </Link>
+            </div>
+
             <button type="submit" disabled={loading}
               className="w-full h-11 bg-[#1D4ED8] hover:bg-blue-700 text-white font-bold rounded-lg text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-60">
               {loading ? <><Loader2 className="w-4 h-4 animate-spin" />Signing in...</> : "Log in"}
@@ -174,7 +196,16 @@ export default function LoginPage() {
 
           <p className="text-center text-sm text-slate-500 mt-5">
             Don&apos;t have an account?{" "}
-            <Link href="/auth/register" className="text-[#1D4ED8] font-bold hover:underline">Register for free</Link>
+            <Link href="/auth/register" className="text-[#1D4ED8] font-bold hover:underline">Register</Link>
+          </p>
+
+          <p className="text-center text-[11px] text-slate-400 mt-6">
+            <Link href="/terms" className="hover:underline">Terms of Service</Link>
+            {"  "}
+            <Link href="/privacy" className="hover:underline">Privacy Policy</Link>
+          </p>
+          <p className="text-center text-[11px] text-slate-400 mt-1">
+            ©2024, Unifinders Education Pvt. Ltd.
           </p>
         </div>
       </div>

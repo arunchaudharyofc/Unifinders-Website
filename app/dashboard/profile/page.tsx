@@ -1,223 +1,223 @@
 "use client";
 
-/**
- * DASHBOARD — PROFILE PAGE
- * Fetch + edit student profile information.
- */
-import { useState, useEffect } from "react";
-import { User, Save, Loader2, CheckCircle2, Phone, Globe, BookOpen, Calendar, Camera } from "lucide-react";
+import { useState } from "react";
+import { Edit2, HelpCircle, Plus, X, ChevronDown } from "lucide-react";
 
-type ProfileData = {
-  fullName: string;
-  phone: string;
-  avatarUrl: string;
-  bio: string;
-  firstName: string;
-  lastName: string;
-  dateOfBirth: string;
-  nationality: string;
-  targetCountry: string;
-  studyLevel: string;
-  fieldOfStudy: string;
-  budgetRange: string;
-  intakeYear: string;
-};
+// ─── Field display helper ───
+function Field({ label, value, isLink }: { label: string; value: string; isLink?: boolean }) {
+  return (
+    <div className="min-w-0">
+      <p className="text-[13px] font-medium text-[#667085] mb-1">{label}</p>
+      <p className={`font-semibold text-[15px] break-words ${isLink ? 'text-[#0070F0]' : 'text-[#101828]'}`}>{value}</p>
+    </div>
+  );
+}
 
-const STUDY_LEVELS = ["", "Certificate", "Diploma", "Bachelor's", "Master's", "PhD", "Foundation"];
-const COUNTRIES = ["", "Australia", "UK", "USA", "Canada", "New Zealand", "Ireland", "Germany", "Japan", "South Korea", "Netherlands", "France", "Switzerland"];
-const INTAKE_YEARS = ["", "2025", "2026", "2027", "2028"];
-const BUDGET_RANGES = ["", "Under $10,000", "$10,000–$20,000", "$20,000–$30,000", "$30,000–$50,000", "Over $50,000"];
-
-export default function ProfilePage() {
-  const [profile, setProfile] = useState<ProfileData>({
-    fullName: "", phone: "", avatarUrl: "", bio: "",
-    firstName: "", lastName: "", dateOfBirth: "", nationality: "Nepali",
-    targetCountry: "", studyLevel: "", fieldOfStudy: "", budgetRange: "", intakeYear: "",
-  });
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchProfile = async () => {
-      setLoading(true);
-      try {
-        const res = await fetch("/api/profile");
-        if (res.ok) {
-          const d = await res.json();
-          const p = d.data?.profile || d.profile || {};
-          const s = d.data?.student || d.student || {};
-          setProfile({
-            fullName: p.fullName || "",
-            phone: p.phone || "",
-            avatarUrl: p.avatarUrl || "",
-            bio: p.bio || "",
-            firstName: s.firstName || "",
-            lastName: s.lastName || "",
-            dateOfBirth: s.dateOfBirth ? s.dateOfBirth.split("T")[0] : "",
-            nationality: s.nationality || "Nepali",
-            targetCountry: s.targetCountry || "",
-            studyLevel: s.studyLevel || "",
-            fieldOfStudy: s.fieldOfStudy || "",
-            budgetRange: s.budgetRange || "",
-            intakeYear: s.intakeYear || "",
-          });
-        }
-      } catch { } finally { setLoading(false); }
-    };
-    fetchProfile();
-  }, []);
-
-  const set = (k: keyof ProfileData) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
-    setProfile(p => ({ ...p, [k]: e.target.value }));
-
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSaving(true); setError(null); setSaved(false);
-    try {
-      const res = await fetch("/api/profile", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(profile),
-      });
-      const d = await res.json();
-      if (!res.ok) { setError(d.error || "Failed to save"); }
-      else { setSaved(true); setTimeout(() => setSaved(false), 3000); }
-    } catch { setError("Network error"); } finally { setSaving(false); }
-  };
-
-  const inp = "w-full h-11 px-4 rounded-xl border border-slate-200 text-sm text-slate-900 placeholder-slate-400 outline-none focus:border-[#0070F0] focus:ring-2 focus:ring-blue-100 transition";
-  const sel = `${inp} bg-white`;
-
-  const initials = (profile.firstName?.[0] || "") + (profile.lastName?.[0] || "") ||
-    profile.fullName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "U";
-
-  if (loading) {
-    return (
-      <div className="max-w-3xl flex items-center justify-center py-24">
-        <Loader2 className="w-8 h-8 text-slate-200 animate-spin" />
-      </div>
-    );
-  }
+export default function ProfilePersonalDetailsPage() {
+  const [editOpen, setEditOpen] = useState(false);
 
   return (
-    <div className="max-w-3xl">
-      <div className="mb-6">
-        <h1 className="text-2xl font-extrabold text-slate-900">My Profile</h1>
-        <p className="text-slate-500 text-sm mt-0.5">Update your personal and academic information</p>
-      </div>
-
-      {/* Avatar card */}
-      <div className="bg-white rounded-2xl border border-slate-100 p-5 mb-6 flex items-center gap-4">
-        <div className="relative">
-          {profile.avatarUrl ? (
-            <img src={profile.avatarUrl} alt="Avatar" className="w-16 h-16 rounded-full object-cover" />
-          ) : (
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#1D4ED8] to-blue-400 flex items-center justify-center text-white font-extrabold text-xl">
-              {initials}
-            </div>
-          )}
-          <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-white rounded-full border border-slate-200 flex items-center justify-center">
-            <Camera className="w-3.5 h-3.5 text-slate-500" />
-          </div>
-        </div>
+    <div className="w-full max-w-5xl mx-auto space-y-6">
+      
+      {/* ─── Header ─── */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <p className="font-bold text-slate-900">{profile.fullName || "Your Name"}</p>
-          <p className="text-sm text-slate-500">{profile.studyLevel ? `${profile.studyLevel} Student` : "Student"} · {profile.targetCountry || "No target country yet"}</p>
+          <h1 className="text-[18px] font-bold text-[#101828] mb-0.5">Personal Details</h1>
+          <p className="text-[13px] text-[#667085]">(You can select multiple choices based upon the tests you have done)</p>
+        </div>
+        <button 
+          onClick={() => setEditOpen(true)}
+          className="flex items-center gap-2 px-4 py-2 border border-[#D0D5DD] rounded-xl bg-white text-[13px] font-semibold text-[#344054] hover:bg-slate-50 transition shadow-sm shrink-0"
+        >
+          <Edit2 className="w-3.5 h-3.5 text-[#0070F0]" /> Edit Details
+        </button>
+      </div>
+
+      {/* ─── Personal Information Card ─── */}
+      <div className="bg-white rounded-2xl border border-[#EAECF0] shadow-sm p-5 sm:p-8">
+        <h2 className="text-[16px] font-bold text-[#101828] flex items-center gap-2 mb-6">
+          Personal Information <HelpCircle className="w-4 h-4 text-[#98A2B3]" />
+        </h2>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-6 gap-x-8">
+          <Field label="Name" value="Riya Maharjan" />
+          <Field label="Gender" value="Female" />
+          <Field label="Email Address" value="riyamaharjan12@gmail.com" isLink />
+          <Field label="Contact" value="+977 9841 568 464" />
+          <Field label="Country of Citizenship" value="Nepal" />
+          <Field label="Date of Birth" value="21 May, 1995" />
+          <Field label="Martial Status" value="Single" />
         </div>
       </div>
 
-      <form onSubmit={handleSave} className="space-y-6">
-        {error && <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3">{error}</div>}
-        {saved && (
-          <div className="bg-green-50 border border-green-200 text-green-700 text-sm rounded-xl px-4 py-3 flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4" /> Profile saved successfully!
-          </div>
-        )}
-
-        {/* Personal Info */}
-        <section className="bg-white rounded-2xl border border-slate-100 p-6">
-          <h2 className="font-bold text-slate-900 mb-4 flex items-center gap-2 text-sm">
-            <User className="w-4 h-4 text-[#0070F0]" /> Personal Information
-          </h2>
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-600 mb-1.5">First Name</label>
-              <input className={inp} value={profile.firstName} onChange={set("firstName")} placeholder="Priya" />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-600 mb-1.5">Last Name</label>
-              <input className={inp} value={profile.lastName} onChange={set("lastName")} placeholder="Sharma" />
-            </div>
-            <div className="sm:col-span-2">
-              <label className="block text-xs font-semibold text-slate-600 mb-1.5">Display Name</label>
-              <input className={inp} value={profile.fullName} onChange={set("fullName")} placeholder="Priya Sharma" />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-600 mb-1.5">Phone / WhatsApp</label>
-              <input className={inp} value={profile.phone} onChange={set("phone")} placeholder="+977 98XXXXXXXX" />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-600 mb-1.5">Date of Birth</label>
-              <input type="date" className={inp} value={profile.dateOfBirth} onChange={set("dateOfBirth")} />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-600 mb-1.5">Nationality</label>
-              <input className={inp} value={profile.nationality} onChange={set("nationality")} placeholder="Nepali" />
-            </div>
-            <div className="sm:col-span-2">
-              <label className="block text-xs font-semibold text-slate-600 mb-1.5">Short Bio</label>
-              <textarea rows={3} className={`${inp} h-auto py-3 resize-none`} value={profile.bio} onChange={set("bio")} placeholder="Tell us a bit about yourself..." />
-            </div>
-          </div>
-        </section>
-
-        {/* Academic Preferences */}
-        <section className="bg-white rounded-2xl border border-slate-100 p-6">
-          <h2 className="font-bold text-slate-900 mb-4 flex items-center gap-2 text-sm">
-            <BookOpen className="w-4 h-4 text-[#0070F0]" /> Academic Preferences
-          </h2>
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-600 mb-1.5">Target Country</label>
-              <select className={sel} value={profile.targetCountry} onChange={set("targetCountry")}>
-                {COUNTRIES.map(c => <option key={c} value={c}>{c || "Select country"}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-600 mb-1.5">Study Level</label>
-              <select className={sel} value={profile.studyLevel} onChange={set("studyLevel")}>
-                {STUDY_LEVELS.map(l => <option key={l} value={l}>{l || "Select level"}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-600 mb-1.5">Field of Study</label>
-              <input className={inp} value={profile.fieldOfStudy} onChange={set("fieldOfStudy")} placeholder="Computer Science, Business..." />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-600 mb-1.5">Target Intake Year</label>
-              <select className={sel} value={profile.intakeYear} onChange={set("intakeYear")}>
-                {INTAKE_YEARS.map(y => <option key={y} value={y}>{y || "Select year"}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-600 mb-1.5">Budget Range (USD/year)</label>
-              <select className={sel} value={profile.budgetRange} onChange={set("budgetRange")}>
-                {BUDGET_RANGES.map(b => <option key={b} value={b}>{b || "Select budget"}</option>)}
-              </select>
-            </div>
-          </div>
-        </section>
-
-        {/* Save */}
-        <div className="flex justify-end">
-          <button type="submit" disabled={saving}
-            className="flex items-center gap-2 px-6 py-3 bg-[#0070F0] hover:bg-blue-700 text-white font-bold rounded-xl transition disabled:opacity-60">
-            {saving ? <><Loader2 className="w-4 h-4 animate-spin" />Saving...</> : <><Save className="w-4 h-4" />Save Profile</>}
-          </button>
+      {/* ─── Address Details Card ─── */}
+      <div className="bg-white rounded-2xl border border-[#EAECF0] shadow-sm p-5 sm:p-8">
+        <h2 className="text-[16px] font-bold text-[#101828] flex items-center gap-2 mb-6">
+          Address Details <HelpCircle className="w-4 h-4 text-[#98A2B3]" />
+        </h2>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-6 gap-x-8">
+          <Field label="Country" value="Nepal" />
+          <Field label="State" value="N/A" />
+          <Field label="City" value="N/A" />
+          <Field label="Address" value="N/A" />
+          <Field label="Postal Code" value="N/A" />
         </div>
-      </form>
+      </div>
+
+      {/* ─── Parent Details Card ─── */}
+      <div className="bg-white rounded-2xl border border-[#EAECF0] shadow-sm p-5 sm:p-8">
+        <h2 className="text-[16px] font-bold text-[#101828] flex items-center gap-2 mb-6">
+          Parent Details <HelpCircle className="w-4 h-4 text-[#98A2B3]" />
+        </h2>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-6 gap-x-8 mb-6">
+          <Field label="Guardian Type" value="Primary" />
+          <Field label="Name" value="Ram Maharjan" />
+          <Field label="Relationship to Student" value="Father" />
+          <Field label="Parent address as the student?" value="Yes" />
+          <Field label="Parent's Contact" value="+977 9841 565 898" />
+          <Field label="Parent's Email Address" value="N/A" />
+        </div>
+
+        <button className="flex items-center gap-2 text-[14px] font-semibold text-[#344054] hover:text-[#0070F0] transition">
+          <div className="w-5 h-5 rounded-full bg-[#0070F0] text-white flex items-center justify-center">
+            <Plus className="w-3 h-3" strokeWidth={3} />
+          </div>
+          Add Guardian
+        </button>
+      </div>
+
+      {/* ─── Edit Personal Details Modal ─── */}
+      {editOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#101828]/40 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-[650px] max-h-[90vh] flex flex-col overflow-hidden">
+            
+            {/* Modal Header */}
+            <div className="p-5 sm:p-6 border-b border-[#EAECF0] flex items-center justify-between shrink-0">
+              <h2 className="text-[18px] font-bold text-[#101828]">Edit Personal Details</h2>
+              <button onClick={() => setEditOpen(false)} className="w-8 h-8 flex items-center justify-center text-[#667085] hover:bg-slate-100 rounded-lg transition">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-5 sm:p-6 overflow-y-auto flex-1 space-y-6">
+              
+              <h3 className="text-[15px] font-bold text-[#101828] flex items-center gap-2">
+                Personal Informations <HelpCircle className="w-4 h-4 text-[#98A2B3]" />
+              </h3>
+
+              {/* Name Row */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="text-[13px] font-semibold text-[#101828] mb-1.5 block">First Name <span className="text-red-500">*</span></label>
+                  <input defaultValue="Riya" className="w-full h-11 px-3 border border-[#D0D5DD] rounded-xl text-[14px] focus:outline-none focus:border-[#0070F0]" />
+                </div>
+                <div>
+                  <label className="text-[13px] font-semibold text-[#101828] mb-1.5 block">Middle Name</label>
+                  <input className="w-full h-11 px-3 border border-[#D0D5DD] rounded-xl text-[14px] focus:outline-none focus:border-[#0070F0]" />
+                </div>
+                <div>
+                  <label className="text-[13px] font-semibold text-[#101828] mb-1.5 block">Last Name <span className="text-red-500">*</span></label>
+                  <input defaultValue="Maharjan" className="w-full h-11 px-3 border border-[#D0D5DD] rounded-xl text-[14px] focus:outline-none focus:border-[#0070F0]" />
+                </div>
+              </div>
+
+              {/* Email & Contact */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[13px] font-semibold text-[#101828] mb-1.5 block">Email <span className="text-red-500">*</span></label>
+                  <input defaultValue="riyamaharjan12@gmail.com" className="w-full h-11 px-3 border border-[#D0D5DD] rounded-xl text-[14px] focus:outline-none focus:border-[#0070F0]" />
+                </div>
+                <div>
+                  <label className="text-[13px] font-semibold text-[#101828] mb-1.5 block">Contact <span className="text-red-500">*</span></label>
+                  <div className="flex">
+                    <div className="h-11 px-3 border border-[#D0D5DD] border-r-0 rounded-l-xl flex items-center gap-1 bg-slate-50 text-[13px] text-[#344054] shrink-0">
+                      NP +977 ▾
+                    </div>
+                    <input className="flex-1 h-11 px-3 border border-[#D0D5DD] rounded-r-xl text-[14px] focus:outline-none focus:border-[#0070F0]" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Country, DOB, Martial */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="text-[13px] font-semibold text-[#101828] mb-1.5 block">Country of Citizenship <span className="text-red-500">*</span></label>
+                  <div className="relative">
+                    <select className="w-full h-11 px-3 border border-[#D0D5DD] rounded-xl text-[14px] text-[#667085] appearance-none bg-white focus:outline-none focus:border-[#0070F0]">
+                      <option>Please choose a country</option>
+                    </select>
+                    <ChevronDown className="w-4 h-4 absolute right-3 top-3.5 text-[#667085] pointer-events-none" />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[13px] font-semibold text-[#101828] mb-1.5 block">Date of Birth <span className="text-red-500">*</span></label>
+                  <input type="date" className="w-full h-11 px-3 border border-[#D0D5DD] rounded-xl text-[14px] text-[#667085] focus:outline-none focus:border-[#0070F0]" />
+                </div>
+                <div>
+                  <label className="text-[13px] font-semibold text-[#101828] mb-1.5 block">Martial Status <span className="text-red-500">*</span></label>
+                  <div className="relative">
+                    <select className="w-full h-11 px-3 border border-[#D0D5DD] rounded-xl text-[14px] text-[#667085] appearance-none bg-white focus:outline-none focus:border-[#0070F0]">
+                      <option>Select</option>
+                    </select>
+                    <ChevronDown className="w-4 h-4 absolute right-3 top-3.5 text-[#667085] pointer-events-none" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Gender & Martial Status */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[13px] font-semibold text-[#101828] mb-1.5 block">Gender <span className="text-red-500">*</span></label>
+                  <div className="relative">
+                    <select className="w-full h-11 px-3 border border-[#D0D5DD] rounded-xl text-[14px] text-[#667085] appearance-none bg-white focus:outline-none focus:border-[#0070F0]">
+                      <option>Select</option>
+                      <option>Male</option>
+                      <option>Female</option>
+                      <option>Prefer not to say</option>
+                    </select>
+                    <ChevronDown className="w-4 h-4 absolute right-3 top-3.5 text-[#667085] pointer-events-none" />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[13px] font-semibold text-[#101828] mb-1.5 block">Martial Status <span className="text-red-500">*</span></label>
+                  <div className="relative">
+                    <select className="w-full h-11 px-3 border border-[#D0D5DD] rounded-xl text-[14px] text-[#667085] appearance-none bg-white focus:outline-none focus:border-[#0070F0]">
+                      <option>Select</option>
+                    </select>
+                    <ChevronDown className="w-4 h-4 absolute right-3 top-3.5 text-[#667085] pointer-events-none" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Desired Specialization */}
+              <div>
+                <label className="text-[13px] font-semibold text-[#101828] mb-1.5 block">Desired specialization</label>
+                <div className="relative">
+                  <select className="w-full h-11 px-3 border border-[#D0D5DD] rounded-xl text-[14px] text-[#667085] appearance-none bg-white focus:outline-none focus:border-[#0070F0]">
+                    <option>Select desired specialization</option>
+                  </select>
+                  <ChevronDown className="w-4 h-4 absolute right-3 top-3.5 text-[#667085] pointer-events-none" />
+                </div>
+              </div>
+
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-5 sm:p-6 border-t border-[#EAECF0] flex items-center justify-end gap-3 shrink-0 bg-white">
+              <button onClick={() => setEditOpen(false)} className="px-5 py-2.5 border border-[#D0D5DD] rounded-xl text-[13px] font-semibold text-[#344054] hover:bg-slate-50 transition">
+                Discard Changes
+              </button>
+              <button onClick={() => setEditOpen(false)} className="px-5 py-2.5 bg-[#0070F0] rounded-xl text-[13px] font-semibold text-white hover:bg-blue-600 transition">
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

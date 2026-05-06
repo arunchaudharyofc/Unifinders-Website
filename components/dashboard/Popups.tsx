@@ -2,17 +2,31 @@
 // Force cache invalidation
 
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Search, ChevronDown, Check, X, ArrowRight, Settings, LayoutDashboard, Clock, FileText, Download, LogOut, Calendar } from "lucide-react";
 import Link from "next/link";
+
+// ── Shared Hook ──────────────────────────────────────────────────────────────
+export function useClickOutside(ref: React.RefObject<HTMLElement | null>, handler: () => void) {
+  useEffect(() => {
+    const listener = (e: MouseEvent) => {
+      if (!ref.current || ref.current.contains(e.target as Node)) return;
+      handler();
+    };
+    document.addEventListener("mousedown", listener);
+    return () => document.removeEventListener("mousedown", listener);
+  }, [ref, handler]);
+}
 
 // ── Dropdown Wrappers ────────────────────────────────────────────────────────
 
 export function CountryGuideDropdown({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  useClickOutside(ref, () => setOpen(false));
   
   return (
-    <div className="relative">
+    <div className="relative" ref={ref}>
       <div onClick={() => setOpen(!open)}>{children}</div>
       {open && (
         <div className="absolute top-full mt-2 left-0 w-[240px] bg-white rounded-xl shadow-lg border border-slate-100 p-2 z-50">
@@ -41,9 +55,11 @@ export function CountryGuideDropdown({ children }: { children: React.ReactNode }
 
 export function NotificationDropdown({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  useClickOutside(ref, () => setOpen(false));
   
   return (
-    <div className="relative">
+    <div className="relative" ref={ref}>
       <div onClick={() => setOpen(!open)}>{children}</div>
       {open && (
         <div className="absolute top-full mt-2 right-0 w-[400px] bg-white rounded-xl shadow-xl border border-slate-200 z-50 overflow-hidden">
@@ -97,9 +113,11 @@ export function NotificationDropdown({ children }: { children: React.ReactNode }
 
 export function MyAccountDropdown({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  useClickOutside(ref, () => setOpen(false));
   
   return (
-    <div className="relative">
+    <div className="relative" ref={ref}>
       <div onClick={() => setOpen(!open)}>{children}</div>
       {open && (
         <div className="absolute top-full mt-2 right-0 w-[260px] bg-white rounded-xl shadow-xl border border-slate-200 z-50 overflow-hidden">
@@ -146,6 +164,8 @@ export function MyAccountDropdown({ children }: { children: React.ReactNode }) {
 export function CustomCountryDropdown() {
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
+  const ref = useRef<HTMLDivElement>(null);
+  useClickOutside(ref, () => setOpen(false));
   
   const options = [
     { id: 'all', label: 'All', icon: null },
@@ -161,7 +181,7 @@ export function CustomCountryDropdown() {
   };
 
   return (
-    <div className="w-full relative">
+    <div className="w-full relative" ref={ref}>
       <label className="block text-sm font-medium text-[#475467] mb-2 text-left">Destination Country</label>
       <div 
         onClick={() => setOpen(!open)}
@@ -214,6 +234,8 @@ export function CustomCountryDropdown() {
 export function CustomIntakeDropdown() {
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
+  const ref = useRef<HTMLDivElement>(null);
+  useClickOutside(ref, () => setOpen(false));
   
   const options = [
     { id: 'apr', label: 'Apr 2024' },
@@ -228,7 +250,7 @@ export function CustomIntakeDropdown() {
   };
 
   return (
-    <div className="w-full relative">
+    <div className="w-full relative" ref={ref}>
       <label className="block text-sm font-medium text-[#475467] mb-2 text-left">Intakes</label>
       <div 
         onClick={() => setOpen(!open)}

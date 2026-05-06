@@ -113,8 +113,8 @@ export async function POST(req: NextRequest) {
 
     const res = ok({ success: true, message: "Profile saved successfully" });
     return withSecurityHeaders(res);
-  } catch (e) {
+  } catch (e: any) {
     log.error("POST failed", e);
-    return err("Failed to save profile. Please try again.", 500);
+    return err(e?.message || "Failed to save profile. Please try again.", 500);
   }
 }

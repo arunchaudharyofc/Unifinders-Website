@@ -1,207 +1,99 @@
 /**
- * Master Seed Script
- * ──────────────────
- * Seeds the database with real university data, study fields,
- * country guides, and help center articles.
- *
- * Usage: npx tsx prisma/seed/index.ts
+ * Master Seed Script — Unifinders Student Portal
+ * Seeds: Universities, Programs, Study Fields, Country Guides, Help Articles
+ * Run: npx tsx prisma/seed/index.ts
  */
-
 import { PrismaClient } from "@prisma/client";
-import { UNIVERSITIES } from "./universities";
-import { STUDY_FIELDS, COUNTRY_GUIDES, HELP_ARTICLES } from "./catalog-data";
+import { universities, studyFields, countryGuides, helpArticles } from "./universities";
 
 const db = new PrismaClient();
 
-async function seedUniversities() {
-  console.log("🏫 Seeding universities & programs...");
-  let uniCount = 0;
-  let progCount = 0;
+async function main() {
+  console.log("🌱 Starting seed...\n");
 
-  for (const uni of UNIVERSITIES) {
-    const { programs, ...uniData } = uni;
+  // 1. Study Fields
+  await db.studyField.createMany({ data: studyFields, skipDuplicates: true });
+  console.log(`   ✅ ${studyFields.length} study fields seeded`);
 
-    const created = await db.university.upsert({
-      where: {
-        // Use a composite lookup by name+country since we don't have stable IDs
-        id: (await db.university.findFirst({
-          where: { name: uni.name, country: uni.country },
-          select: { id: true },
-        }))?.id ?? "new-" + Math.random(),
-      },
+  // 2. Country Guides
+  console.log("🌍 Seeding country guides...");
+  for (const guide of countryGuides) {
+    await db.countryGuide.upsert({
+      where: { slug: guide.slug },
+      update: { overview: guide.overview },
       create: {
-        name: uniData.name,
-        country: uniData.country,
-        city: uniData.city,
-        type: uniData.type,
-        established: uniData.established,
-        ranking: uniData.ranking,
-        websiteUrl: uniData.websiteUrl,
-        coverImageUrl: uniData.coverImageUrl,
-        description: uniData.description,
-        intakes: uniData.intakes,
-        minIelts: uniData.minIelts,
-        minToefl: uniData.minToefl,
-        minGpa: uniData.minGpa,
-        tuitionRangeMin: uniData.tuitionRangeMin,
-        tuitionRangeMax: uniData.tuitionRangeMax,
-        applicationFee: uniData.applicationFee,
-        studentCount: uniData.studentCount,
-        acceptanceRate: uniData.acceptanceRate,
-        isActive: true,
-      },
-      update: {
-        city: uniData.city,
-        type: uniData.type,
-        established: uniData.established,
-        ranking: uniData.ranking,
-        websiteUrl: uniData.websiteUrl,
-        coverImageUrl: uniData.coverImageUrl,
-        description: uniData.description,
-        intakes: uniData.intakes,
-        minIelts: uniData.minIelts,
-        minToefl: uniData.minToefl,
-        minGpa: uniData.minGpa,
-        tuitionRangeMin: uniData.tuitionRangeMin,
-        tuitionRangeMax: uniData.tuitionRangeMax,
-        applicationFee: uniData.applicationFee,
-        studentCount: uniData.studentCount,
-        acceptanceRate: uniData.acceptanceRate,
+        country: guide.country, slug: guide.slug, flagEmoji: guide.flagEmoji,
+        bannerImageUrl: guide.bannerImageUrl, overview: guide.overview,
+        whyStudyHere: guide.whyStudyHere, livingCost: guide.livingCost,
+        visaRequirements: guide.visaRequirements, intakes: guide.intakes,
+        currency: guide.currency, avgTuitionMin: guide.avgTuitionMin,
+        avgTuitionMax: guide.avgTuitionMax, universityCount: guide.universityCount,
+        isActive: guide.isActive, displayOrder: guide.displayOrder,
       },
     });
+  }
+  console.log(`   ✅ ${countryGuides.length} country guides seeded`);
 
-    uniCount++;
-
-    // Seed programs for this university
-    for (const prog of programs) {
-      const existing = await db.universityProgram.findFirst({
-        where: { universityId: created.id, name: prog.name, level: prog.level },
+  // 3. Universities + Programs
+  console.log("🏛️  Seeding universities and programs...");
+  let programCount = 0;
+  for (const uni of universities) {
+    const { programs, slug, ...uniData } = uni as any;
+    let created = await db.university.findFirst({ where: { name: uniData.name, country: uniData.country } });
+    if (!created) {
+      created = await db.university.create({
+        data: {
+          name: uniData.name,
+          country: uniData.country,
+          city: uniData.city,
+          type: uniData.type,
+          ranking: uniData.ranking,
+          established: uniData.established,
+          description: uniData.description,
+          websiteUrl: uniData.website,
+          coverImageUrl: uniData.coverImageUrl,
+          logoUrl: uniData.logoUrl,
+          intakes: uniData.intakes,
+          isActive: uniData.isActive,
+          tuitionRangeMin: uniData.tuitionRangeMin,
+          tuitionRangeMax: uniData.tuitionRangeMax,
+        },
       });
-
-      if (!existing) {
+    }
+    for (const prog of programs) {
+      const existingProg = await db.universityProgram.findFirst({
+        where: { universityId: created!.id, name: prog.name },
+      });
+      if (!existingProg) {
         await db.universityProgram.create({
           data: {
-            universityId: created.id,
+            universityId: created!.id,
             name: prog.name,
             level: prog.level,
             field: prog.field,
-            duration: prog.duration,
+            duration: `${prog.durationMonths} months`,
             tuitionFee: prog.tuitionFee,
             isActive: true,
           },
         });
-        progCount++;
+        programCount++;
       }
     }
   }
+  console.log(`   ✅ ${universities.length} universities and ${programCount} programs seeded`);
 
-  console.log(`   ✅ ${uniCount} universities, ${progCount} new programs`);
-}
-
-async function seedStudyFields() {
-  console.log("📚 Seeding study fields...");
-  let count = 0;
-
-  for (const field of STUDY_FIELDS) {
-    await db.studyField.upsert({
-      where: { slug: field.slug },
-      create: field,
-      update: {
-        name: field.name,
-        iconUrl: field.iconUrl,
-        description: field.description,
-        displayOrder: field.displayOrder,
-      },
-    });
-    count++;
-  }
-
-  console.log(`   ✅ ${count} study fields`);
-}
-
-async function seedCountryGuides() {
-  console.log("🌍 Seeding country guides...");
-  let count = 0;
-
-  for (const guide of COUNTRY_GUIDES) {
-    await db.countryGuide.upsert({
-      where: { slug: guide.slug },
-      create: {
-        country: guide.country,
-        slug: guide.slug,
-        flagEmoji: guide.flagEmoji,
-        flagUrl: guide.flagUrl,
-        bannerImageUrl: guide.bannerImageUrl,
-        overview: guide.overview,
-        whyStudyHere: guide.whyStudyHere,
-        livingCost: guide.livingCost as object,
-        visaRequirements: guide.visaRequirements as object,
-        topCities: guide.topCities,
-        workRights: guide.workRights as object,
-        intakes: guide.intakes,
-        currency: guide.currency,
-        avgTuitionMin: guide.avgTuitionMin,
-        avgTuitionMax: guide.avgTuitionMax,
-        universityCount: guide.universityCount,
-        displayOrder: guide.displayOrder,
-      },
-      update: {
-        overview: guide.overview,
-        whyStudyHere: guide.whyStudyHere,
-        livingCost: guide.livingCost as object,
-        visaRequirements: guide.visaRequirements as object,
-        topCities: guide.topCities,
-        workRights: guide.workRights as object,
-        intakes: guide.intakes,
-        avgTuitionMin: guide.avgTuitionMin,
-        avgTuitionMax: guide.avgTuitionMax,
-        universityCount: guide.universityCount,
-      },
-    });
-    count++;
-  }
-
-  console.log(`   ✅ ${count} country guides`);
-}
-
-async function seedHelpArticles() {
-  console.log("📖 Seeding help articles...");
-  let count = 0;
-
-  for (const article of HELP_ARTICLES) {
+  // 4. Help Articles
+  console.log("❓ Seeding help articles...");
+  for (const article of helpArticles) {
     await db.helpArticle.upsert({
       where: { slug: article.slug },
+      update: { title: article.title, content: article.content },
       create: article,
-      update: {
-        title: article.title,
-        content: article.content,
-        category: article.category,
-        tags: article.tags,
-        displayOrder: article.displayOrder,
-      },
     });
-    count++;
   }
+  console.log(`   ✅ ${helpArticles.length} help articles seeded`);
 
-  console.log(`   ✅ ${count} help articles`);
+  console.log("\n🎉 Seed completed successfully!");
 }
 
-async function main() {
-  console.log("\n🚀 Starting Unifinders database seed...\n");
-
-  try {
-    await seedStudyFields();
-    await seedCountryGuides();
-    await seedHelpArticles();
-    await seedUniversities();
-
-    console.log("\n✨ Seed completed successfully!\n");
-  } catch (error) {
-    console.error("\n❌ Seed failed:", error);
-    process.exit(1);
-  } finally {
-    await db.$disconnect();
-  }
-}
-
-main();
+main().catch((e) => { console.error("❌ Seed failed:", e); process.exit(1); }).finally(() => db.$disconnect());

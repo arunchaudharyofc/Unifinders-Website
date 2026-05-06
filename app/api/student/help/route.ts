@@ -1,5 +1,6 @@
 /**
- * GET /api/student/help — list help articles by category
+ * GET /api/student/help
+ * Help center articles - list or single article by slug
  */
 import { NextRequest } from "next/server";
 import { db } from "@/lib/db";
@@ -9,36 +10,34 @@ export async function GET(req: NextRequest) {
   const authResult = await requireAuth(req);
   if ("status" in authResult) return authResult;
 
-  const url = new URL(req.url);
-  const category = url.searchParams.get("category") || undefined;
-  const q = url.searchParams.get("q") || "";
+  const { searchParams } = new URL(req.url);
+  const slug = searchParams.get("slug");
+  const category = searchParams.get("category") || "";
+  const q = searchParams.get("q") || "";
 
-  try {
-    const where: Record<string, unknown> = { isPublished: true };
-    if (category) where.category = category;
-    if (q) {
-      where.OR = [
-        { title: { contains: q, mode: "insensitive" } },
-        { content: { contains: q, mode: "insensitive" } },
-        { tags: { has: q.toLowerCase() } },
-      ];
-    }
-
-    const articles = await db.helpArticle.findMany({
-      where: where as any,
-      orderBy: { displayOrder: "asc" },
-      select: { id: true, category: true, title: true, slug: true, tags: true, viewCount: true },
-    });
-
-    // Group by category
-    const grouped: Record<string, typeof articles> = {};
-    articles.forEach(a => {
-      if (!grouped[a.category]) grouped[a.category] = [];
-      grouped[a.category].push(a);
-    });
-
-    return withSecurityHeaders(ok(category ? articles : grouped));
-  } catch (e) {
-    return err("Failed to fetch help articles", 500);
+  if (slug) {
+    const article = await db.helpArticle.findUnique({ where: { slug } });
+    if (!article) return err("Article not found", 404);
+    // Increment view count
+    await db.helpArticle.update({ where: { slug }, data: { viewCount: { increment: 1 } } });
+    return withSecurityHeaders(ok(article));
   }
+
+  const where: any = { isPublished: true };
+  if (category) where.category = category;
+  if (q) where.OR = [{ title: { contains: q, mode: "insensitive" } }, { tags: { has: q } }];
+
+  const articles = await db.helpArticle.findMany({
+    where,
+    orderBy: [{ category: "asc" }, { displayOrder: "asc" }],
+  });
+
+  // Group by category
+  const grouped = articles.reduce((acc: Record<string, any[]>, article) => {
+    if (!acc[article.category]) acc[article.category] = [];
+    acc[article.category].push(article);
+    return acc;
+  }, {});
+
+  return withSecurityHeaders(ok({ articles, grouped }));
 }

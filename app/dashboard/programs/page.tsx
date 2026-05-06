@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -8,15 +8,8 @@ import {
   ChevronDown,
   Check,
   BookOpen,
-  Monitor,
-  HardHat,
-  Briefcase,
-  Coffee,
-  Users,
-  Cpu,
-  GraduationCap,
-  HeartPulse,
 } from "lucide-react";
+
 
 /* ═══════════════════════════════════════════════════════════════════════════
    DATA — move to API / Supabase in Phase 2
@@ -38,27 +31,18 @@ const INTAKE_GROUPS = [
   { label: "Dec - Mar 2025", months: ["Dec 2024", "Jan 2025", "Feb 2025", "Mar 2025"] },
 ];
 
-const FIELD_IMAGES: Record<string, string> = {
-  "Computer and Information":    "https://cdn-icons-png.flaticon.com/512/2721/2721304.png",
-  "Engineering":                 "https://cdn-icons-png.flaticon.com/512/2942/2942243.png",
-  "Management":                  "https://cdn-icons-png.flaticon.com/512/3135/3135789.png",
-  "Hospitality Management":      "https://cdn-icons-png.flaticon.com/512/3531/3531806.png",
-  "Humanities and Social Services": "https://cdn-icons-png.flaticon.com/512/3997/3997872.png",
-  "Science and Technology":      "https://cdn-icons-png.flaticon.com/512/2942/2942909.png",
-  "Education":                   "https://cdn-icons-png.flaticon.com/512/3135/3135810.png",
-  "Health Professional Education": "https://cdn-icons-png.flaticon.com/512/2913/2913465.png",
+
+const FIELD_ICONS: Record<string, string> = {
+  "Computer Science":    "https://cdn-icons-png.flaticon.com/512/2721/2721304.png",
+  "Engineering":         "https://cdn-icons-png.flaticon.com/512/2942/2942243.png",
+  "Business & Management": "https://cdn-icons-png.flaticon.com/512/3135/3135789.png",
+  "Data Science":        "https://cdn-icons-png.flaticon.com/512/2942/2942909.png",
+  "Nursing & Healthcare": "https://cdn-icons-png.flaticon.com/512/2913/2913465.png",
+  "Architecture & Design": "https://cdn-icons-png.flaticon.com/512/1048/1048945.png",
+  "Arts & Humanities":   "https://cdn-icons-png.flaticon.com/512/3997/3997872.png",
+  "Law":                 "https://cdn-icons-png.flaticon.com/512/3135/3135810.png",
 };
 
-const FIELDS = [
-  { title: "Computer and Information", programs: 156 },
-  { title: "Engineering", programs: 156 },
-  { title: "Management", programs: 156 },
-  { title: "Hospitality Management", programs: 156 },
-  { title: "Humanities and Social Services", programs: 156 },
-  { title: "Science and Technology", programs: 156 },
-  { title: "Education", programs: 156 },
-  { title: "Health Professional Education", programs: 156 },
-];
 
 /* ═══════════════════════════════════════════════════════════════════════════
    REUSABLE DROPDOWN
@@ -174,16 +158,16 @@ function IntakeDropdown({ selected, onChange }: { selected: string[]; onChange: 
 /* ═══════════════════════════════════════════════════════════════════════════
    STUDY FIELD CARD
    ═══════════════════════════════════════════════════════════════════════════ */
-function StudyFieldCard({ title, programs }: { title: string; programs: number }) {
+function StudyFieldCard({ title, programs, slug }: { title: string; programs: number; slug: string }) {
   const router = useRouter();
   return (
     <div
-      onClick={() => router.push(`/dashboard/programs/search?field=${encodeURIComponent(title)}`)}
+      onClick={() => router.push(`/dashboard/programs/search?field=${encodeURIComponent(slug)}`)}
       className="bg-white rounded-2xl border border-[#EAECF0] shadow-sm flex flex-col cursor-pointer hover:shadow-md hover:-translate-y-1 transition-all duration-200"
     >
       <div className="flex-1 flex items-center justify-center py-8 px-4" style={{ minHeight: "160px" }}>
         <img
-          src={FIELD_IMAGES[title] || "https://cdn-icons-png.flaticon.com/512/2721/2721304.png"}
+          src={FIELD_ICONS[title] || "https://cdn-icons-png.flaticon.com/512/2721/2721304.png"}
           alt={title}
           className="w-24 h-24 object-contain"
         />
@@ -199,6 +183,7 @@ function StudyFieldCard({ title, programs }: { title: string; programs: number }
   );
 }
 
+
 /* ═══════════════════════════════════════════════════════════════════════════
    MAIN PAGE
    ═══════════════════════════════════════════════════════════════════════════ */
@@ -207,6 +192,15 @@ export default function ExploreProgramsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
   const [selectedIntakes, setSelectedIntakes] = useState<string[]>([]);
+  const [fields, setFields] = useState<any[]>([]);
+  const [loadingFields, setLoadingFields] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/student/programs/fields")
+      .then((r) => r.json())
+      .then((json) => { if (json.success) setFields(json.data); })
+      .finally(() => setLoadingFields(false));
+  }, []);
 
   const handleSearch = () => {
     const params = new URLSearchParams();
@@ -269,9 +263,18 @@ export default function ExploreProgramsPage() {
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {FIELDS.map(f => (
-            <StudyFieldCard key={f.title} title={f.title} programs={f.programs} />
-          ))}
+          {loadingFields ? (
+            [...Array(8)].map((_, i) => (
+              <div key={i} className="bg-white rounded-2xl border border-slate-100 h-52 animate-pulse">
+                <div className="h-36 bg-slate-200 rounded-t-2xl" />
+                <div className="p-4 space-y-2"><div className="h-4 bg-slate-200 rounded w-3/4" /><div className="h-3 bg-slate-100 rounded w-1/2" /></div>
+              </div>
+            ))
+          ) : (
+            fields.map((f) => (
+              <StudyFieldCard key={f.id} title={f.name} programs={f.programCount} slug={f.slug} />
+            ))
+          )}
         </div>
       </div>
     </div>

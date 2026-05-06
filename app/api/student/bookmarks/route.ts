@@ -1,80 +1,37 @@
 /**
- * /api/student/bookmarks
- * GET  — list bookmarks (filter by entityType: university|program|scholarship)
- * POST — add a bookmark
+ * GET  /api/student/bookmarks        — list bookmarks by type
+ * POST /api/student/bookmarks        — add bookmark
+ * DELETE /api/student/bookmarks      — remove bookmark (body: entityType, entityId)
  */
 import { NextRequest } from "next/server";
 import { db } from "@/lib/db";
-import { ok, err, requireAuth, parseBody, missingFields, withSecurityHeaders } from "@/lib/api-helpers";
+import { ok, err, requireAuth, parseBody, withSecurityHeaders } from "@/lib/api-helpers";
 
 export async function GET(req: NextRequest) {
   const authResult = await requireAuth(req);
   if ("status" in authResult) return authResult;
   const { ctx } = authResult;
 
-  const url = new URL(req.url);
-  const entityType = url.searchParams.get("type") || undefined;
-  const page = Math.max(1, parseInt(url.searchParams.get("page") || "1"));
-  const limit = Math.min(50, parseInt(url.searchParams.get("limit") || "12"));
+  const type = new URL(req.url).searchParams.get("type") || "";
+  const where: any = { userId: ctx.userId };
+  if (type) where.entityType = type;
 
-  try {
-    const where = {
-      userId: ctx.userId,
-      ...(entityType ? { entityType } : {}),
-    };
+  const bookmarks = await db.bookmark.findMany({ where, orderBy: { createdAt: "desc" } });
 
-    const [bookmarks, total] = await Promise.all([
-      db.bookmark.findMany({
-        where,
-        orderBy: { createdAt: "desc" },
-        skip: (page - 1) * limit,
-        take: limit,
-      }),
-      db.bookmark.count({ where }),
-    ]);
+  // Enrich with entity data
+  const enriched = await Promise.all(
+    bookmarks.map(async (bm) => {
+      let entity: any = null;
+      if (bm.entityType === "university") {
+        entity = await db.university.findFirst({ where: { id: bm.entityId }, select: { id: true, name: true, country: true, city: true, ranking: true, coverImageUrl: true, logoUrl: true, type: true } });
+      } else if (bm.entityType === "program") {
+        entity = await db.universityProgram.findFirst({ where: { id: bm.entityId }, include: { university: { select: { id: true, name: true, country: true } } } });
+      }
+      return { ...bm, entity };
+    })
+  );
 
-    // Hydrate bookmark entities
-    const hydrated = await Promise.all(
-      bookmarks.map(async (bm) => {
-        let entity: Record<string, unknown> | null = null;
-        if (bm.entityType === "university") {
-          entity = await db.university.findUnique({
-            where: { id: bm.entityId },
-            select: {
-              id: true, name: true, country: true, city: true, type: true,
-              ranking: true, established: true, coverImageUrl: true, logoUrl: true,
-              intakes: true, _count: { select: { programs: true } },
-            },
-          });
-        } else if (bm.entityType === "program") {
-          entity = await db.universityProgram.findUnique({
-            where: { id: bm.entityId },
-            include: {
-              university: {
-                select: { id: true, name: true, country: true, logoUrl: true, coverImageUrl: true, ranking: true },
-              },
-            },
-          });
-        } else if (bm.entityType === "scholarship") {
-          entity = await db.scholarship.findUnique({
-            where: { id: bm.entityId },
-            select: {
-              id: true, title: true, provider: true, country: true,
-              level: true, amount: true, deadline: true, imageUrl: true,
-            },
-          });
-        }
-        return { ...bm, entity };
-      })
-    );
-
-    return withSecurityHeaders(ok({
-      data: hydrated,
-      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
-    }));
-  } catch (e) {
-    return err("Failed to fetch bookmarks", 500);
-  }
+  return withSecurityHeaders(ok(enriched));
 }
 
 export async function POST(req: NextRequest) {
@@ -82,31 +39,29 @@ export async function POST(req: NextRequest) {
   if ("status" in authResult) return authResult;
   const { ctx } = authResult;
 
-  const body = await parseBody<Record<string, unknown>>(req);
+  const body = await parseBody<{ entityType: string; entityId: string }>(req);
   if ("status" in body) return body as Response;
-  const b = body as Record<string, unknown>;
+  const { entityType, entityId } = body as { entityType: string; entityId: string };
 
-  const missing = missingFields(b, ["entityType", "entityId"]);
-  if (missing) return err(missing, 422);
-
-  const entityType = String(b.entityType);
-  const entityId = String(b.entityId);
-
-  if (!["university", "program", "scholarship"].includes(entityType)) {
-    return err("entityType must be university, program, or scholarship", 422);
-  }
+  if (!entityType || !entityId) return err("entityType and entityId are required", 422);
 
   try {
-    const bookmark = await db.bookmark.upsert({
-      where: {
-        userId_entityType_entityId: { userId: ctx.userId, entityType, entityId },
-      },
-      create: { userId: ctx.userId, entityType, entityId },
-      update: {},
-    });
-
+    const bookmark = await db.bookmark.create({ data: { userId: ctx.userId, entityType, entityId } });
     return withSecurityHeaders(ok(bookmark, 201));
-  } catch (e) {
-    return err("Failed to create bookmark", 500);
+  } catch {
+    return err("Already bookmarked", 409);
   }
+}
+
+export async function DELETE(req: NextRequest) {
+  const authResult = await requireAuth(req);
+  if ("status" in authResult) return authResult;
+  const { ctx } = authResult;
+
+  const body = await parseBody<{ entityType: string; entityId: string }>(req);
+  if ("status" in body) return body as Response;
+  const { entityType, entityId } = body as { entityType: string; entityId: string };
+
+  await db.bookmark.deleteMany({ where: { userId: ctx.userId, entityType, entityId } });
+  return withSecurityHeaders(ok({ deleted: true }));
 }

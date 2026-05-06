@@ -56,9 +56,9 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Upsert Student row
+    // Upsert Student row (by email to prevent unique constraint failures with existing seeded data)
     await db.student.upsert({
-      where: { userId: ctx.userId },
+      where: { email: ctx.email },
       create: {
         userId: ctx.userId,
         email: ctx.email,
@@ -86,6 +86,7 @@ export async function POST(req: NextRequest) {
         profileStatus: "COMPLETE",
       },
       update: {
+        userId: ctx.userId,
         firstName,
         lastName,
         phone: s(b.mobile, 20),

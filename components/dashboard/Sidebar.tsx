@@ -94,6 +94,22 @@ export default function Sidebar({ isAdmin }: { isAdmin: boolean }) {
               <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Admin</p>
             </div>
             {renderLinks(ADMIN_ITEMS)}
+
+            {/* Staff Portal Link */}
+            <div className="mt-3 px-2">
+              <Link
+                href="/staff"
+                className="flex items-center justify-between bg-emerald-50 border border-emerald-100 hover:bg-emerald-100 transition-colors p-3 rounded-xl group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-7 h-7 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                    <Users className="w-3.5 h-3.5" />
+                  </div>
+                  <span className="text-xs font-bold text-emerald-700">Staff Portal</span>
+                </div>
+                <ChevronRight className="w-3.5 h-3.5 text-emerald-400 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+            </div>
           </div>
         )}
 

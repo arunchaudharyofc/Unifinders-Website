@@ -132,6 +132,9 @@ model Staff {
   id          String    @id @default(uuid())
   userId      String    @unique @map("user_id")
   department  String?
+  designation String?
+  joinDate    DateTime? @map("join_date") @db.Date
+  employeeId  String?   @unique @map("employee_id")
 
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
@@ -765,4 +768,164 @@ model CountryGuide {
   updatedAt        DateTime @updatedAt @map("updated_at")
 
   @@map("country_guides")
+}
+
+// ─── Staff Portal: Attendance ─────────────────────────────────────────────────
+
+model Attendance {
+  id          String           @id @default(uuid())
+  staffUserId String           @map("staff_user_id")
+  date        DateTime         @db.Date
+  checkIn     DateTime?        @map("check_in")
+  checkOut    DateTime?        @map("check_out")
+  status      AttendanceStatus @default(PRESENT)
+  workHours   Float?           @map("work_hours")
+  ipAddress   String?          @map("ip_address")
+  notes       String?
+  lateReason  String?          @map("late_reason")
+
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+
+  @@unique([staffUserId, date])
+  @@index([staffUserId])
+  @@index([date])
+  @@map("attendances")
+}
+
+enum AttendanceStatus {
+  PRESENT
+  LATE
+  HALF_DAY
+  ABSENT
+  ON_LEAVE
+  HOLIDAY
+  WEEKEND
+}
+
+// ─── Staff Portal: Leave Management ──────────────────────────────────────────
+
+model LeaveRequest {
+  id           String      @id @default(uuid())
+  staffUserId  String      @map("staff_user_id")
+  leaveType    LeaveType   @map("leave_type")
+  startDate    DateTime    @map("start_date") @db.Date
+  endDate      DateTime    @map("end_date") @db.Date
+  totalDays    Float       @map("total_days")
+  reason       String
+  status       LeaveStatus @default(PENDING)
+  reviewedById String?     @map("reviewed_by_id")
+  reviewedAt   DateTime?   @map("reviewed_at")
+  reviewNote   String?     @map("review_note")
+
+  createdAt    DateTime    @default(now()) @map("created_at")
+  updatedAt    DateTime    @updatedAt @map("updated_at")
+
+  @@index([staffUserId])
+  @@index([status])
+  @@index([startDate, endDate])
+  @@map("leave_requests")
+}
+
+enum LeaveType {
+  ANNUAL
+  SICK
+  CASUAL
+  UNPAID
+  MATERNITY
+  PATERNITY
+  BEREAVEMENT
+  COMPENSATORY
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+model LeaveBalance {
+  id            String    @id @default(uuid())
+  staffUserId   String    @map("staff_user_id")
+  year          Int
+  leaveType     LeaveType @map("leave_type")
+  totalDays     Float     @map("total_days")
+  usedDays      Float     @default(0) @map("used_days")
+  remainingDays Float     @map("remaining_days")
+
+  @@unique([staffUserId, year, leaveType])
+  @@map("leave_balances")
+}
+
+// ─── Staff Portal: Holidays Calendar ─────────────────────────────────────────
+
+model Holiday {
+  id          String      @id @default(uuid())
+  name        String
+  date        DateTime    @db.Date
+  type        HolidayType @default(PUBLIC)
+  description String?
+  isOptional  Boolean     @default(false) @map("is_optional")
+  createdById String      @map("created_by_id")
+
+  createdAt   DateTime    @default(now()) @map("created_at")
+
+  @@unique([date])
+  @@index([date])
+  @@map("holidays")
+}
+
+enum HolidayType {
+  PUBLIC
+  RELIGIOUS
+  COMPANY
+  RESTRICTED
+}
+
+// ─── Staff Portal: Tasks & Todos ─────────────────────────────────────────────
+
+model StaffTask {
+  id           String          @id @default(uuid())
+  staffUserId  String          @map("staff_user_id")
+  assignedById String?         @map("assigned_by_id")
+  title        String
+  description  String?
+  status       StaffTaskStatus @default(TODO)
+  priority     TaskPriority    @default(MEDIUM)
+  dueDate      DateTime?       @map("due_date") @db.Date
+  completedAt  DateTime?       @map("completed_at")
+  category     String?
+
+  createdAt    DateTime        @default(now()) @map("created_at")
+  updatedAt    DateTime        @updatedAt @map("updated_at")
+
+  @@index([staffUserId, status])
+  @@index([dueDate])
+  @@map("staff_tasks")
+}
+
+enum StaffTaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+  CANCELLED
+}
+
+// ─── Staff Portal: Daily Work Logs ───────────────────────────────────────────
+
+model DailyLog {
+  id             String   @id @default(uuid())
+  staffUserId    String   @map("staff_user_id")
+  date           DateTime @db.Date
+  summary        String
+  tasksCompleted Int      @default(0) @map("tasks_completed")
+  highlights     String?
+  blockers       String?
+
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@unique([staffUserId, date])
+  @@map("daily_logs")
 }

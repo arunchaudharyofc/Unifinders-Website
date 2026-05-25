@@ -26,8 +26,8 @@ export async function updateSession(request: NextRequest) {
   // ── Route Protection ──────────────────────────────────────────────────────
   const path = request.nextUrl.pathname
 
-  // Protect /dashboard and /onboarding — redirect to login if not authenticated
-  const protectedPaths = ['/dashboard', '/onboarding']
+  // Protect /dashboard, /onboarding, and /staff — redirect to login if not authenticated
+  const protectedPaths = ['/dashboard', '/onboarding', '/staff']
   if (protectedPaths.some(p => path.startsWith(p)) && !user) {
     const url = request.nextUrl.clone()
     url.pathname = '/auth/login'

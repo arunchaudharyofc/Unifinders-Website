@@ -71,13 +71,14 @@ export default function LoginPage() {
       setLoading(false);
       return;
     }
-    // Smart redirect: new users → onboarding, existing → dashboard
+    // Smart redirect: route by role
     try {
       const res = await fetch('/api/profile');
       if (res.ok) {
         const profile = await res.json();
-        if (profile?.data?.role === 'student') {
-          router.push('/dashboard');
+        const role = profile?.data?.role;
+        if (role === 'staff' || role === 'admin') {
+          router.push('/staff');
         } else {
           router.push('/dashboard');
         }

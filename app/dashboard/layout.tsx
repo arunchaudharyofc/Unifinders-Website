@@ -52,6 +52,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
       profile = { role: "student" };
     }
+
+    // Staff users should use the Staff Portal, not the student dashboard
+    if (profile.role === "staff") {
+      redirect("/staff");
+    }
   } catch (e) {
     console.warn("DB unavailable for dashboard profile lookup, defaulting to student role. Please check if your IP is allowlisted in Supabase.");
     // Dashboard still loads — just without admin features if DB is down

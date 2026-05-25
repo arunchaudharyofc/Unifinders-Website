@@ -25,16 +25,27 @@ export async function GET(request: Request) {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (user) {
-        // Check if user has completed onboarding (has a student record)
-        let hasStudentRecord = false;
+        // Check user's role from profile for smart redirect
+        let destination = "/onboarding";
         try {
-          const student = await db.student.findUnique({
+          const profile = await db.profile.findUnique({
             where: { userId: user.id },
-            select: { id: true },
+            select: { role: true },
           });
-          hasStudentRecord = !!student;
+
+          if (profile) {
+            // Existing user — route by role
+            if (profile.role === "staff" || profile.role === "admin") {
+              destination = "/staff";
+            } else {
+              destination = "/dashboard";
+            }
+          } else {
+            // No profile = new user → onboarding
+            destination = "/onboarding";
+          }
         } catch (e) {
-          log.warn("Failed to check student record, defaulting to onboarding", e);
+          log.warn("Failed to check profile role, defaulting to onboarding", e);
         }
 
         // If explicit next param, honour it
@@ -43,9 +54,7 @@ export async function GET(request: Request) {
           return NextResponse.redirect(`${origin}${next}`);
         }
 
-        // Smart redirect based on onboarding status
-        const destination = hasStudentRecord ? "/dashboard" : "/onboarding";
-        log.info(`Auth callback: user=${user.id}, hasStudent=${hasStudentRecord}, redirecting to ${destination}`);
+        log.info(`Auth callback: user=${user.id}, redirecting to ${destination}`);
         return NextResponse.redirect(`${origin}${destination}`);
       }
 

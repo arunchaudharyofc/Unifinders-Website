@@ -34,10 +34,11 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // Redirect authenticated users away from auth pages → dashboard
-  if (user && path.startsWith('/auth/') && !path.startsWith('/auth/callback')) {
+  // Redirect authenticated users away from auth pages
+  // (Login/callback handle the actual role-based destination)
+  if (user && (path === '/auth/login' || path === '/auth/register') && !path.startsWith('/auth/callback')) {
     const url = request.nextUrl.clone()
-    url.pathname = '/dashboard'
+    url.pathname = '/'
     return NextResponse.redirect(url)
   }
   // ─────────────────────────────────────────────────────────────────────────

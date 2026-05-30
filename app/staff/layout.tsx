@@ -7,6 +7,7 @@
  */
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { db } from "@/lib/db";
 import StaffLayoutClient from "./StaffLayoutClient";
 

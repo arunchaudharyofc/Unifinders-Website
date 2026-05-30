@@ -8,9 +8,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-
-import StaffSidebar from "@/components/staff/StaffSidebar";
-import StaffHeader from "@/components/staff/StaffHeader";
+import StaffLayoutClient from "./StaffLayoutClient";
 
 export const metadata = {
   title: "Staff Portal — Unifinders",
@@ -58,14 +56,13 @@ export default async function StaffLayout({ children }: { children: React.ReactN
   const userAvatar = profile?.avatar || null;
 
   return (
-    <div className="flex h-screen bg-[#F8FAFC]">
-      <StaffSidebar isAdmin={isAdmin} />
-      <div className="flex-1 flex flex-col md:ml-64 overflow-hidden">
-        <StaffHeader userName={userName} userAvatar={userAvatar} userEmail={user.email || ""} />
-        <main className="flex-1 overflow-y-auto p-6">
-          {children}
-        </main>
-      </div>
-    </div>
+    <StaffLayoutClient
+      isAdmin={isAdmin}
+      userName={userName}
+      userAvatar={userAvatar}
+      userEmail={user.email || ""}
+    >
+      {children}
+    </StaffLayoutClient>
   );
 }

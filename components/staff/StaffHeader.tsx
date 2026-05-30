@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Bell, ChevronDown, Search, Menu, X, LogOut, Settings, User } from "lucide-react";
+import { Bell, ChevronDown, Menu, LogOut, Settings, User } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 function useClickOutside(ref: React.RefObject<HTMLElement | null>, handler: () => void) {
   useEffect(() => {
@@ -20,15 +21,40 @@ export default function StaffHeader({
   userName,
   userAvatar,
   userEmail,
+  onMenuToggle,
 }: {
   userName: string;
   userAvatar: string | null;
   userEmail: string;
+  onMenuToggle?: () => void;
 }) {
   const [profileOpen, setProfileOpen] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
   useClickOutside(profileRef, () => setProfileOpen(false));
+  const pathname = usePathname();
+
+  // Title map — covers both staff portal and admin staff pages
+  const titleMap: [string, string][] = [
+    // Staff pages
+    ["/staff/attendance", "Attendance"],
+    ["/staff/leave", "Leave Management"],
+    ["/staff/calendar", "Calendar & Holidays"],
+    ["/staff/tasks", "My Tasks"],
+    ["/staff/daily-log", "Daily Log"],
+    // Admin staff pages
+    ["/dashboard/admin/staff/attendance", "Attendance Sheet & Corrections"],
+    ["/dashboard/admin/staff/leaves", "Leave Approvals"],
+    ["/dashboard/admin/staff/holidays", "Holiday Calendar Manager"],
+    ["/dashboard/admin/staff/tasks", "Task Manager"],
+    ["/dashboard/admin/staff/reports", "Attendance Reports"],
+    ["/dashboard/admin/staff", "Staff Overview"],
+    // Fallback
+    ["/staff", "Staff Dashboard"],
+  ];
+  
+  const currentTitle = titleMap.find(
+    ([path]) => pathname === path || pathname.startsWith(path + "/")
+  )?.[1] || "Staff Dashboard";
 
   const initials = userName
     .split(" ")
@@ -38,32 +64,26 @@ export default function StaffHeader({
     .toUpperCase();
 
   return (
-    <header className="h-16 bg-white border-b border-slate-100 flex items-center justify-between px-6 sticky top-0 z-30">
-      {/* Mobile menu toggle */}
-      <button
-        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        className="md:hidden p-2 rounded-lg hover:bg-slate-100 transition"
-      >
-        {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-      </button>
-
-      {/* Search */}
-      <div className="hidden md:flex items-center gap-3 flex-1 max-w-md">
-        <div className="relative w-full">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-          <input
-            type="text"
-            placeholder="Search tasks, staff, logs..."
-            className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 placeholder-slate-400 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 transition"
-          />
-        </div>
+    <header className="h-20 bg-slate-50 border-b border-slate-100 flex items-center justify-between px-6 md:px-8 sticky top-0 z-30 w-full">
+      {/* Title & Mobile Toggle */}
+      <div className="flex items-center gap-4">
+        <button
+          onClick={onMenuToggle}
+          className="md:hidden p-2 rounded-xl hover:bg-slate-200 transition text-slate-600 active:scale-95"
+          aria-label="Open sidebar menu"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
+        <h1 className="text-xl font-bold text-[#1E293B] hidden sm:block" suppressHydrationWarning>
+          {currentTitle}
+        </h1>
       </div>
 
       {/* Right side */}
-      <div className="flex items-center gap-4">
-        {/* Date/Time */}
-        <div className="hidden lg:block text-right">
-          <p className="text-xs font-medium text-slate-500">
+      <div className="flex items-center gap-4 md:gap-6">
+        {/* Date/Time — hidden on small screens */}
+        <div className="hidden lg:block">
+          <p className="text-sm font-medium text-slate-500">
             {new Date().toLocaleDateString("en-US", {
               weekday: "long",
               year: "numeric",
@@ -73,74 +93,72 @@ export default function StaffHeader({
           </p>
         </div>
 
-        {/* Notifications */}
-        <button className="relative p-2 rounded-lg hover:bg-slate-100 transition">
-          <Bell className="w-5 h-5 text-slate-500" />
-          <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
-        </button>
-
-        {/* Profile */}
-        <div className="relative" ref={profileRef}>
-          <button
-            onClick={() => setProfileOpen(!profileOpen)}
-            className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-slate-50 transition"
-          >
-            {userAvatar ? (
-              <Image
-                src={userAvatar}
-                alt={userName}
-                width={32}
-                height={32}
-                className="w-8 h-8 rounded-full object-cover"
-                unoptimized
-              />
-            ) : (
-              <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold">
-                {initials}
-              </div>
-            )}
-            <div className="hidden sm:block text-left">
-              <p className="text-sm font-semibold text-slate-800 leading-none">{userName}</p>
-              <p className="text-[10px] text-slate-400 mt-0.5">Staff</p>
-            </div>
-            <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+        <div className="flex items-center gap-3 md:gap-4 md:border-l md:border-slate-200 md:pl-6">
+          {/* Notifications */}
+          <button className="relative p-2 rounded-full hover:bg-slate-200 transition text-slate-500">
+            <Bell className="w-5 h-5" />
+            <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 border-2 border-slate-50 rounded-full" />
           </button>
 
-          {profileOpen && (
-            <div className="absolute top-full mt-2 right-0 w-56 bg-white rounded-xl shadow-xl border border-slate-200 z-50 overflow-hidden">
-              <div className="p-3 border-b border-slate-100">
-                <p className="text-sm font-semibold text-slate-800">{userName}</p>
-                <p className="text-xs text-slate-400 truncate">{userEmail}</p>
+          {/* Profile */}
+          <div className="relative" ref={profileRef}>
+            <button
+              onClick={() => setProfileOpen(!profileOpen)}
+              className="flex items-center gap-2 md:gap-3 p-1.5 rounded-full hover:bg-slate-200 transition group"
+            >
+              {userAvatar ? (
+                <Image
+                  src={userAvatar}
+                  alt={userName}
+                  width={36}
+                  height={36}
+                  className="w-9 h-9 rounded-full object-cover shadow-sm"
+                  unoptimized
+                />
+              ) : (
+                <div className="w-9 h-9 rounded-full bg-[#10B981] shadow-sm text-white flex items-center justify-center text-sm font-bold">
+                  {initials}
+                </div>
+              )}
+              <ChevronDown className="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition hidden sm:block" />
+            </button>
+
+            {profileOpen && (
+              <div className="absolute top-full mt-3 right-0 w-64 bg-white rounded-2xl shadow-xl border border-slate-100 z-50 overflow-hidden animate-fade-in">
+                <div className="p-4 border-b border-slate-100 bg-slate-50">
+                  <p className="text-sm font-bold text-slate-900">{userName}</p>
+                  <p className="text-xs text-slate-500 truncate mt-0.5">{userEmail}</p>
+                </div>
+                <div className="py-2">
+                  <Link
+                    href="/staff"
+                    className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition"
+                    onClick={() => setProfileOpen(false)}
+                  >
+                    <User className="w-4 h-4 text-slate-400" />
+                    My Dashboard
+                  </Link>
+                  <Link
+                    href="/dashboard/settings"
+                    className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition"
+                    onClick={() => setProfileOpen(false)}
+                  >
+                    <Settings className="w-4 h-4 text-slate-400" />
+                    Settings
+                  </Link>
+                </div>
+                <div className="border-t border-slate-100 py-2">
+                  <Link
+                    href="/auth/logout"
+                    className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-red-500 hover:bg-red-50 transition"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Sign Out
+                  </Link>
+                </div>
               </div>
-              <div className="py-1">
-                <Link
-                  href="/staff"
-                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition"
-                  onClick={() => setProfileOpen(false)}
-                >
-                  <User className="w-4 h-4 text-slate-400" />
-                  My Profile
-                </Link>
-                <Link
-                  href="/dashboard/settings"
-                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition"
-                  onClick={() => setProfileOpen(false)}
-                >
-                  <Settings className="w-4 h-4 text-slate-400" />
-                  Settings
-                </Link>
-              </div>
-              <div className="border-t border-slate-100">
-                <Link
-                  href="/auth/logout"
-                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition"
-                >
-                  <LogOut className="w-4 h-4" />
-                  Sign Out
-                </Link>
-              </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </header>

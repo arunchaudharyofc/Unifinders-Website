@@ -72,24 +72,24 @@ export default function LoginPage() {
       return;
     }
     // Smart redirect: route by role
+    // Using window.location.href forces a hard navigation so the server picks up the new auth cookies reliably.
     try {
       const res = await fetch('/api/profile');
       if (res.ok) {
         const profile = await res.json();
         const role = profile?.data?.role;
         if (role === 'staff' || role === 'admin') {
-          router.push('/staff');
+          window.location.href = '/staff';
         } else {
-          router.push('/dashboard');
+          window.location.href = '/dashboard';
         }
       } else {
-        router.push('/onboarding');
+        window.location.href = '/onboarding';
       }
-    } catch {
-      router.push('/dashboard');
+    } catch (err) {
+      console.error("Profile fetch error:", err);
+      window.location.href = '/dashboard';
     }
-    router.refresh();
-    setLoading(false);
   };
 
   const handleGoogleLogin = async () => {
@@ -120,7 +120,7 @@ export default function LoginPage() {
 
       <div className="flex-1 flex flex-col justify-center px-8 py-10">
         <div className="max-w-sm w-full mx-auto">
-          <p className="text-xs font-bold text-[#1D4ED8] mb-1">Welcome to Unifinders!</p>
+          <p className="text-xs font-bold text-[#1D4ED8] mb-1" suppressHydrationWarning>Welcome to Unifinders!</p>
           <h1 className="text-2xl font-extrabold text-slate-900 mb-6">Log into your account</h1>
 
           {error && (

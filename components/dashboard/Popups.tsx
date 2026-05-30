@@ -111,26 +111,43 @@ export function NotificationDropdown({ children }: { children: React.ReactNode }
   );
 }
 
-export function MyAccountDropdown({ children }: { children: React.ReactNode }) {
+export function MyAccountDropdown({
+  children,
+  fullName,
+  initials,
+  email,
+  userId,
+}: {
+  children: React.ReactNode;
+  fullName?: string;
+  initials?: string;
+  email?: string;
+  userId?: string;
+}) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useClickOutside(ref, () => setOpen(false));
-  
+
+  const displayName = fullName || "User";
+  const displayInitials = initials || displayName.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
+  const shortId = userId ? userId.slice(0, 10).toUpperCase() : "—";
+
   return (
     <div className="relative" ref={ref}>
       <div onClick={() => setOpen(!open)}>{children}</div>
       {open && (
-        <div className="absolute top-full mt-2 right-0 w-[260px] bg-white rounded-xl shadow-xl border border-slate-200 z-50 overflow-hidden">
-          <div className="p-4 flex items-center gap-3 border-b border-slate-100">
-            <div className="w-12 h-12 rounded-full bg-[#0070F0] text-white flex items-center justify-center font-bold">
-              RM
+        <div className="absolute top-full mt-2 right-0 w-[280px] bg-white rounded-xl shadow-xl border border-slate-200 z-50 overflow-hidden">
+          <div className="p-4 flex items-center gap-3 border-b border-slate-100 bg-slate-50/60">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#0070F0] to-[#0055CC] text-white flex items-center justify-center font-bold text-sm shadow-sm flex-shrink-0">
+              {displayInitials}
             </div>
-            <div>
-              <h4 className="font-bold text-slate-900 text-sm">Riya Maharjan</h4>
-              <div className="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full mt-1 font-medium inline-block">ID: 454541611212</div>
+            <div className="min-w-0">
+              <h4 className="font-bold text-slate-900 text-sm truncate">{displayName}</h4>
+              {email && <p className="text-[11px] text-slate-400 truncate mt-0.5">{email}</p>}
+              <div className="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full mt-1 font-mono font-semibold inline-block border border-blue-100">ID: {shortId}</div>
             </div>
           </div>
-          
+
           <div className="py-2">
             <Link href="/dashboard" className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 text-sm font-medium text-[#0B1A2D]">
               <LayoutDashboard className="w-5 h-5 text-slate-400" /> My Dashboard

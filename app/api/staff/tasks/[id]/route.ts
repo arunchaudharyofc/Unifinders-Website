@@ -16,7 +16,7 @@ export async function PUT(
   const { id } = await params;
 
   const body = await parseBody<Record<string, unknown>>(req);
-  if ("status" in body) return body as Response;
+  if (body instanceof Response) return body;
   const b = body as Record<string, unknown>;
 
   try {

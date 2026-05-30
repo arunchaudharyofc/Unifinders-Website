@@ -7,8 +7,9 @@ import {
   LayoutDashboard, Clock, CalendarDays, FileText,
   CheckSquare, ClipboardList, Users, Settings,
   ShieldAlert, Calendar, BarChart2, ChevronRight,
-  HelpCircle, LogOut
+  HelpCircle, LogOut, X
 } from "lucide-react";
+import { useEffect } from "react";
 
 const MAIN_ITEMS = [
   { label: "Dashboard",    href: "/staff",              icon: LayoutDashboard },
@@ -20,16 +21,32 @@ const MAIN_ITEMS = [
 ];
 
 const ADMIN_ITEMS = [
-  { label: "Staff Overview",   href: "/dashboard/admin/staff",            icon: Users },
-  { label: "Attendance Sheet", href: "/dashboard/admin/staff/attendance", icon: Calendar },
-  { label: "Leave Approvals",  href: "/dashboard/admin/staff/leaves",     icon: FileText },
-  { label: "Holidays",         href: "/dashboard/admin/staff/holidays",   icon: CalendarDays },
-  { label: "Task Manager",     href: "/dashboard/admin/staff/tasks",      icon: CheckSquare },
-  { label: "Reports",          href: "/dashboard/admin/staff/reports",    icon: BarChart2 },
+  { label: "Staff Overview",   href: "/staff/admin/staff",            icon: Users },
+  { label: "Attendance Sheet", href: "/staff/admin/attendance",       icon: Calendar },
+  { label: "Leave Approvals",  href: "/staff/admin/leaves",           icon: FileText },
+  { label: "Holidays",         href: "/staff/admin/holidays",         icon: CalendarDays },
+  { label: "Task Manager",     href: "/staff/admin/tasks",            icon: CheckSquare },
+  { label: "Reports",          href: "/staff/admin/reports",          icon: BarChart2 },
 ];
 
-export default function StaffSidebar({ isAdmin }: { isAdmin: boolean }) {
+interface StaffSidebarProps {
+  isAdmin: boolean;
+  mobileOpen?: boolean;
+  onClose?: () => void;
+}
+
+export default function StaffSidebar({ isAdmin, mobileOpen = false, onClose }: StaffSidebarProps) {
   const pathname = usePathname();
+
+  // Lock body scroll on mobile when sidebar is open
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [mobileOpen]);
 
   const renderLinks = (items: typeof MAIN_ITEMS) => (
     <ul className="space-y-1">
@@ -45,6 +62,7 @@ export default function StaffSidebar({ isAdmin }: { isAdmin: boolean }) {
             )}
             <Link
               href={item.href}
+              onClick={onClose}
               className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 text-sm font-medium ${
                 isActive
                   ? "bg-emerald-50 text-emerald-700"
@@ -64,24 +82,33 @@ export default function StaffSidebar({ isAdmin }: { isAdmin: boolean }) {
     </ul>
   );
 
-  return (
-    <aside className="hidden md:flex w-64 flex-col bg-white border-r border-slate-100 fixed h-full z-40">
-      {/* Logo */}
-      <div className="h-20 flex items-center px-6 gap-3">
-        <Link href="/staff" className="flex items-center gap-3">
+  const SidebarContent = () => (
+    <div className="flex flex-col h-full">
+      {/* Logo + close button on mobile */}
+      <div className="h-20 flex items-center px-6 gap-3 justify-between">
+        <Link href="/staff" className="flex items-center gap-3" onClick={onClose}>
           <Image
             src="/images/logo.png" alt="Unifinders" width={140} height={36}
             className="object-contain"
           />
         </Link>
+        {/* Mobile close button */}
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="md:hidden p-2 rounded-full hover:bg-slate-100 transition text-slate-500"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
       </div>
 
       {/* Divider with portal label */}
-      <div className="mx-4 mb-2">
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 rounded-lg border border-emerald-100">
-          <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-xs font-bold text-emerald-700 tracking-wide uppercase">Staff Portal</span>
-        </div>
+      <div className="mx-6 mb-4 mt-2">
+        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] animate-pulse" />
+          Staff Portal
+        </p>
       </div>
 
       {/* Nav */}
@@ -106,6 +133,7 @@ export default function StaffSidebar({ isAdmin }: { isAdmin: boolean }) {
       <div className="p-4 pt-2 space-y-2">
         <Link
           href="/dashboard"
+          onClick={onClose}
           className="flex items-center justify-between bg-blue-50 border border-blue-100 hover:bg-blue-100 transition-colors p-3 rounded-xl group"
         >
           <div className="flex items-center gap-3">
@@ -125,6 +153,30 @@ export default function StaffSidebar({ isAdmin }: { isAdmin: boolean }) {
           Sign Out
         </Link>
       </div>
-    </aside>
+    </div>
+  );
+
+  return (
+    <>
+      {/* Desktop sidebar (always visible on md+) */}
+      <aside className="hidden md:flex w-64 flex-col bg-white border-r border-slate-100 fixed h-full z-40">
+        <SidebarContent />
+      </aside>
+
+      {/* Mobile overlay + drawer */}
+      {mobileOpen && (
+        <>
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-sm md:hidden"
+            onClick={onClose}
+          />
+          {/* Drawer */}
+          <aside className="fixed left-0 top-0 h-full w-72 max-w-[85vw] z-50 bg-white shadow-2xl md:hidden flex flex-col overflow-hidden">
+            <SidebarContent />
+          </aside>
+        </>
+      )}
+    </>
   );
 }

@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
   const { ctx } = authResult;
 
   const body = await parseBody<{ entityType: string; entityId: string }>(req);
-  if ("status" in body) return body as Response;
+  if (body instanceof Response) return body;
   const { entityType, entityId } = body as { entityType: string; entityId: string };
 
   if (!entityType || !entityId) return err("entityType and entityId are required", 422);
@@ -59,7 +59,7 @@ export async function DELETE(req: NextRequest) {
   const { ctx } = authResult;
 
   const body = await parseBody<{ entityType: string; entityId: string }>(req);
-  if ("status" in body) return body as Response;
+  if (body instanceof Response) return body;
   const { entityType, entityId } = body as { entityType: string; entityId: string };
 
   await db.bookmark.deleteMany({ where: { userId: ctx.userId, entityType, entityId } });

@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
   if (ctx.role !== "staff" && ctx.role !== "admin") return err("Access denied", 403);
 
   const body = await parseBody<Record<string, unknown>>(req);
-  if ("status" in body) return body as Response;
+  if (body instanceof Response) return body;
   const b = body as Record<string, unknown>;
 
   const leaveType = b.leaveType as string;

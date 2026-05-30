@@ -89,7 +89,7 @@ export default function PartnerUniversitiesSection({ universities }: { universit
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-5 mb-12">
           {filteredUniversities.slice(0, 15).map((uni: any, i: number) => (
             <div
-              key={uni.name}
+              key={uni.id || `${uni.name}-${i}`}
               className="bg-white rounded-xl p-4 flex items-center justify-center h-20 shadow-sm border border-slate-100 hover:shadow-md hover:border-blue-200 hover:-translate-y-0.5 transition-all duration-300 group animate-fade-up"
               style={{ animationDelay: `${i * 50}ms` }}
               title={uni.name}

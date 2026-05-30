@@ -1,9 +1,14 @@
 /**
  * PUT /api/admin/staff/leave-requests/[id]  — Approve or reject a leave request
+ * Sends email notification to the staff member after decision.
  */
 import { NextRequest } from "next/server";
 import { db } from "@/lib/db";
 import { ok, err, requireAuth, parseBody } from "@/lib/api-helpers";
+import {
+  sendLeaveApprovedEmail,
+  sendLeaveRejectedEmail,
+} from "@/lib/email-templates";
 
 export async function PUT(
   req: NextRequest,
@@ -17,7 +22,7 @@ export async function PUT(
   if (ctx.role !== "admin") return err("Admin access required", 403);
 
   const body = await parseBody<Record<string, unknown>>(req);
-  if ("status" in body) return body as Response;
+  if (body instanceof Response) return body;
   const b = body as Record<string, unknown>;
 
   const action = b.action as string; // "approve" or "reject"
@@ -31,6 +36,7 @@ export async function PUT(
     if (leave.status !== "PENDING") return err("Can only review pending requests", 400);
 
     const newStatus = action === "approve" ? "APPROVED" : "REJECTED";
+    const reviewNote = (b.note as string)?.trim()?.slice(0, 500) || null;
 
     const updated = await db.leaveRequest.update({
       where: { id },
@@ -38,7 +44,7 @@ export async function PUT(
         status: newStatus,
         reviewedById: ctx.userId,
         reviewedAt: new Date(),
-        reviewNote: (b.note as string)?.trim()?.slice(0, 500) || null,
+        reviewNote,
       },
     });
 
@@ -68,6 +74,42 @@ export async function PUT(
         }
         d.setDate(d.getDate() + 1);
       }
+    }
+
+    // Send email notification to staff member (non-blocking)
+    try {
+      const staffProfile = await db.profile.findUnique({
+        where: { userId: leave.staffUserId },
+        select: { fullName: true },
+      });
+      const staffName = staffProfile?.fullName || "Staff Member";
+      // Build email from name pattern (same as other routes)
+      const staffEmail = staffName.toLowerCase().includes("staff")
+        ? "staff@unifinders.com"
+        : `${staffName.toLowerCase().replace(/\s+/g, ".")}@unifinders.com`;
+
+      if (newStatus === "APPROVED") {
+        await sendLeaveApprovedEmail({
+          staffEmail,
+          staffName,
+          leaveType: leave.leaveType,
+          startDate: leave.startDate.toISOString(),
+          endDate: leave.endDate.toISOString(),
+          totalDays: leave.totalDays,
+          adminNote: reviewNote,
+        });
+      } else {
+        await sendLeaveRejectedEmail({
+          staffEmail,
+          staffName,
+          leaveType: leave.leaveType,
+          startDate: leave.startDate.toISOString(),
+          endDate: leave.endDate.toISOString(),
+          adminNote: reviewNote,
+        });
+      }
+    } catch (emailErr) {
+      console.warn("Leave decision email failed (non-critical):", emailErr);
     }
 
     return ok({

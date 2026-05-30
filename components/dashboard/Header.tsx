@@ -11,11 +11,13 @@ import { CountryGuideDropdown, NotificationDropdown, MyAccountDropdown, Appointm
 export default function Header({ 
   fullName, 
   initials, 
-  email 
+  email,
+  userId,
 }: { 
   fullName: string; 
   initials: string; 
   email: string;
+  userId?: string;
 }) {
   const pathname = usePathname();
 
@@ -82,7 +84,7 @@ export default function Header({
           </div>
 
           {/* Profile Dropdown Trigger */}
-          <MyAccountDropdown>
+          <MyAccountDropdown fullName={fullName} initials={initials} email={email} userId={userId}>
             <div className="flex items-center gap-2 cursor-pointer group">
               <div className="w-9 h-9 rounded-full bg-[#0070F0] flex items-center justify-center text-white text-sm font-bold shadow-sm">
                 {initials}

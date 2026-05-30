@@ -46,11 +46,11 @@ export interface AuthContext {
 export async function requireAuth(
   req: NextRequest
 ): Promise<{ ctx: AuthContext } | NextResponse> {
-  void req; // consumed via cookie store automatically
   const supabase = await createClient();
   const { data: { user }, error } = await supabase.auth.getUser();
 
   if (error || !user) {
+    console.error("[API requireAuth] Auth validation failed. error:", error, "user:", user ? "exists" : "null");
     return err("Unauthorized — please log in", 401);
   }
 

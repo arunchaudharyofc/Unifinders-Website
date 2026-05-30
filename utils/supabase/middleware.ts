@@ -21,7 +21,16 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
-  const { data: { user } } = await supabase.auth.getUser()
+  let user = null;
+  try {
+    const { data, error } = await supabase.auth.getUser();
+    user = data?.user;
+    if (error) {
+      console.error("[Middleware updateSession] getUser failed. error:", error);
+    }
+  } catch (err) {
+    console.error("[Middleware updateSession] getUser crashed. error:", err);
+  }
 
   // ── Route Protection ──────────────────────────────────────────────────────
   const path = request.nextUrl.pathname

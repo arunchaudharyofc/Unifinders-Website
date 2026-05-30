@@ -17,9 +17,30 @@ export const metadata = {
 
 export default async function StaffLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
-  const { data } = await supabase.auth.getUser();
-  const user = data?.user;
-  if (!user) redirect("/auth/login");
+  let user = null;
+  let authError = null;
+
+  try {
+    const cookieStore = await cookies();
+    const cookieNames = cookieStore.getAll().map(c => c.name);
+    console.log("[StaffLayout Diagnostics] Present cookies:", cookieNames);
+    
+    const { data, error } = await supabase.auth.getUser();
+    authError = error;
+    user = data?.user;
+    
+    console.log("[StaffLayout Diagnostics] User retrieved:", user ? { id: user.id, email: user.email } : null);
+    if (error) {
+      console.error("[StaffLayout Diagnostics] getUser error:", error);
+    }
+  } catch (e) {
+    console.error("[StaffLayout Diagnostics] Auth checking crashed:", e);
+  }
+
+  if (!user) {
+    console.warn("[StaffLayout Diagnostics] No authenticated user found, redirecting to /auth/login. getUser error was:", authError);
+    redirect("/auth/login");
+  }
 
   let profile: { role: string; fullName: string; avatar: string | null } | null = null;
 

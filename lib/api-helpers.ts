@@ -48,9 +48,19 @@ export async function requireAuth(
 ): Promise<{ ctx: AuthContext } | NextResponse> {
   void req; // consumed via cookie store automatically
   const supabase = await createClient();
-  const { data: { user }, error } = await supabase.auth.getUser();
+  let user = null;
+  let authError = null;
+  
+  try {
+    const { data, error } = await supabase.auth.getUser();
+    authError = error;
+    user = data?.user;
+  } catch (e) {
+    console.error("[API requireAuth] getUser crashed:", e);
+  }
 
-  if (error || !user) {
+  if (authError || !user) {
+    console.error("[API requireAuth] Failed to authorize user. getUser error:", authError);
     return err("Unauthorized — please log in", 401);
   }
 

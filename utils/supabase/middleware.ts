@@ -12,7 +12,18 @@ export async function updateSession(request: NextRequest) {
         getAll() { return request.cookies.getAll() },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
-          supabaseResponse = NextResponse.next({ request })
+          
+          // Sync request headers so downstream Route Handlers and layouts see the fresh cookies
+          const requestHeaders = new Headers(request.headers)
+          const cookieString = request.cookies.getAll().map(c => `${c.name}=${c.value}`).join('; ')
+          requestHeaders.set('cookie', cookieString)
+          
+          supabaseResponse = NextResponse.next({
+            request: {
+              headers: requestHeaders,
+            },
+          })
+          
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options)
           )

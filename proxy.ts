@@ -1,12 +1,9 @@
 /**
- * Next.js Middleware
+ * Next.js Proxy (formerly Middleware)
  * ──────────────────
- * ⚠️  THIS FILE MUST BE NAMED middleware.ts — Next.js ignores any other name.
- *     (Previously named proxy.ts, which caused it to NEVER run, breaking all auth.)
- *
  * Runs on every request BEFORE the page renders.
  * 1. Refresh Supabase session (keep cookies fresh)
- * 2. Protect /dashboard, /onboarding, and /staff routes
+ * 2. Protect /dashboard and /onboarding
  * 3. Set security headers (CSP WITHOUT nonce — see note below)
  *
  * ⚠️  WHY NO NONCE IN CSP:
@@ -38,7 +35,7 @@ const COURSE_ALIASES: Record<string, string> = {
 
 /**
  * CSP without nonce so 'unsafe-inline' is honoured by the browser.
- * Headers are also set in next.config.ts for static routes — this middleware
+ * Headers are also set in next.config.ts for static routes — this proxy
  * overrides them for dynamic SSR routes where we need the full value.
  */
 const CSP = [
@@ -55,7 +52,7 @@ const CSP = [
   "upgrade-insecure-requests",
 ].join("; ");
 
-export default async function middleware(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
   // 0. Course alias redirects
   const { pathname } = request.nextUrl;
   const courseTarget = COURSE_ALIASES[pathname];

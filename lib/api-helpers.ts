@@ -46,6 +46,7 @@ export interface AuthContext {
 export async function requireAuth(
   req: NextRequest
 ): Promise<{ ctx: AuthContext } | NextResponse> {
+  void req; // consumed via cookie store automatically
   const supabase = await createClient();
   const { data: { user }, error } = await supabase.auth.getUser();
 
